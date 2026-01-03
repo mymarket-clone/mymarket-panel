@@ -1,0 +1,5 @@
+{
+  "*.{ts,js,json}": "bun prettier --write",
+  "*.ts": "bun eslint --fix --max-warnings=0",
+  "*.js": "bun eslint --fix --max-warnings=0"
+}

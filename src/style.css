@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'TBCXRegular';
+  src: url('/fonts/TBCXRegular.woff2'), format('woff2');
+}
+
+.font-regular {
+  font-family: 'TBCXRegular', sans-serif;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'TBCXRegular', sans-serif;
+}
+
+html,
+body {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  -webkit-text-fill-color: #000;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+:root {
+  --primary: #ffd102;
+  --background: rgb(38, 44, 48);
+  --white: #fff;
+  --gray: rgb(217, 217, 217);
+}
