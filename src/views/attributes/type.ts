@@ -9,3 +9,12 @@ export type Attribute = {
   attributeType: AttributeType
   unitId?: number
 }
+
+export type AttributeOption = {
+  id: number
+  attributeId: number
+  order: string
+  name: string
+  nameEn?: string
+  nameRu?: string
+}

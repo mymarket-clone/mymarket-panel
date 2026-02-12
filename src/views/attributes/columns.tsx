@@ -1,6 +1,7 @@
 import type { Attribute } from './type'
 import { ActionCol } from '../../components/ActionCol'
 import type { CustomColumnType } from '../../types/CustomCol'
+import { AttributeType } from '../../types/enums/AttributeType'
 
 export type ColumnsProps = {
   onAdd: () => void
@@ -43,13 +44,22 @@ export const columns = ({ onAdd, onEdit, onDelete }: ColumnsProps): CustomColumn
       title: 'Type',
       dataIndex: 'attributeType',
       key: 'attributeType',
+      render: (v: AttributeType) => {
+        const typeLabels = Object.fromEntries(
+          Object.entries(AttributeType)
+            .filter(([key, value]) => typeof value === 'number' && key)
+            .map(([key, value]) => [value, key])
+        ) as Record<number, string>
+
+        return typeLabels[v] || 'Unknown'
+      },
       required: true,
     },
     {
       title: 'Unit',
       dataIndex: 'unitId',
       key: 'unitId',
-      required: true,
+      render: (v) => v || '-',
     },
     ActionCol({
       onAdd,

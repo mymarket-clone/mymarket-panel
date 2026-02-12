@@ -13,4 +13,13 @@ export default {
   editAttribute: 'attributes',
   addAttribute: 'attributes',
   deleteAttribute: 'attributes',
+  getAllUnits: 'units/getAll',
+  getUnitsById: 'units/getById',
+  editUnit: 'units',
+  addUnit: 'units',
+  deleteUnit: 'units',
+  addAttributeOption: 'attributeOptions',
+  editAttributeOption: 'attributeOptions',
+  deleteAttributeOption: 'attributeOptions',
+  getAllByIdAttributeOption: 'attributeOptions/getAllById',
 }
