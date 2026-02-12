@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import type { FormInstance } from 'antd'
-import type { HttpMethod } from '../types/enums/HttpMethod'
+import { HttpMethod } from '../types/enums/HttpMethod'
 import { axiosDefaultInstance } from '../api/axios'
 import { applyAxiosFormErrors } from '../api/axiosErrors'
 import type { IBaseError } from '../interfaces/response/IBaseResponse'
@@ -55,7 +55,7 @@ export function useFetch<
         const requestBody = overrideBody ?? body
         const requestParams = overrideParams ?? params
 
-        if (httpMethod === 'get' || httpMethod === 'delete') {
+        if (httpMethod === HttpMethod.GET || httpMethod === HttpMethod.DELETE) {
           response = await axiosDefaultInstance[httpMethod]<ApiResponse<Data>>(url, {
             params: requestParams,
           })

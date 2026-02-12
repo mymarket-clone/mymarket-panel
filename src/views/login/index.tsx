@@ -26,7 +26,7 @@ const LoginView = () => {
       body: values,
       onSuccess: (user) => {
         setUser(user)
-        navigate('/categories')
+        navigate('/attributes')
       },
     })
   }

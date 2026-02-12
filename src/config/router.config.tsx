@@ -1,9 +1,9 @@
 import type { Route } from '../types/Route'
-import CategoriesView from '../views/categories'
+import AttributesView from '../views/attributes'
 
 export const routes: Route[] = [
   {
-    path: 'categories',
-    view: CategoriesView,
+    path: 'attributes',
+    view: AttributesView,
   },
 ]

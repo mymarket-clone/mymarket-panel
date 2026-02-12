@@ -42,7 +42,7 @@ function mapRoutes(appRoutes: Route[]): RouteObject[] {
     {
       path: '/login',
       element: (
-        <ProtectedRoute guard={false} redirectTo="/categories">
+        <ProtectedRoute guard={false} redirectTo="/attributes">
           <LoginView />
         </ProtectedRoute>
       ),
@@ -54,7 +54,7 @@ function mapRoutes(appRoutes: Route[]): RouteObject[] {
           <MainLayout />
         </ProtectedRoute>
       ),
-      children: [{ index: true, element: <Navigate to="/categories" replace /> }, ...mainChildren],
+      children: [{ index: true, element: <Navigate to="/attributes" replace /> }, ...mainChildren],
     },
   ]
 

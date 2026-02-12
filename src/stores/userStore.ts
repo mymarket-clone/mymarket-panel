@@ -4,7 +4,7 @@ import type { UserStore } from '../types/User'
 
 export const useUserStore = create<UserStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       accessToken: null,
       refreshToken: null,
       expiresAt: null,
@@ -17,6 +17,10 @@ export const useUserStore = create<UserStore>()(
           expiresAt: null,
           user: null,
         })),
+      setAccessToken: (token: string | null) => set({ accessToken: token }),
+      getAccessToken: () => get().accessToken,
+      setRefreshToken: (token: string | null) => set({ refreshToken: token }),
+      getRefreshToken: () => get().refreshToken,
     }),
     {
       name: 'auth-storage',
