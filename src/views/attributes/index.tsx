@@ -12,6 +12,8 @@ import { AttributeType } from '../../types/enums/AttributeType'
 import AttributeOptionsTable from './optionsTable'
 import { optionColumns } from './optionsColumns'
 import { bindErrorToForm } from '../../utils/bindErrorToForm'
+import { useElementSize } from '@custom-react-hooks/use-element-size'
+import { PageWrapper } from '../../style'
 
 const AttributesView = () => {
   const { data: initialData, loading } = useFetch<Attribute[]>({
@@ -22,6 +24,7 @@ const AttributesView = () => {
   const [optionsByAttributeId, setOptionsByAttributeId] = useState<Record<number, AttributeOption[]>>({})
   const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set())
   const [activeAttributeId, setActiveAttributeId] = useState<number | null>(null)
+  const [ref, size] = useElementSize()
 
   const [data, setData] = useState<Attribute[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -61,6 +64,51 @@ const AttributesView = () => {
     setOptionEditingData(null)
     form.resetFields()
     setOptionDrawerOpen(true)
+  }
+
+  const handleSubmit = async (values: Attribute) => {
+    try {
+      if (editingData) {
+        await axiosDefaultInstance.put(`${api.editAttribute}/${editingData.id}`, values)
+        setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
+        message.success('Updated successfully')
+      } else {
+        const res = await axiosDefaultInstance.post(api.addAttribute, values)
+        setData((prev) => {
+          const updated = [...prev, res.data]
+          updated.sort((a, b) => a.id - b.id)
+          return updated
+        })
+        message.success('Added successfully')
+      }
+      setDrawerOpen(false)
+      form.resetFields()
+    } catch (error: any) {
+      bindErrorToForm({ error, form })
+    }
+  }
+
+  const onOptionEdit = (id: number, attributeId: number) => {
+    const option = optionsByAttributeId[attributeId]?.find((o) => o.id === id) || null
+    setActiveAttributeId(attributeId)
+    setOptionEditingData(option)
+    if (option) form.setFieldsValue(option)
+    setOptionDrawerOpen(true)
+  }
+
+  const onOptionDelete = async (id: number, attributeId: number) => {
+    try {
+      await axiosDefaultInstance.delete(`${api.deleteAttributeOption}/${id}`)
+
+      setOptionsByAttributeId((prev) => ({
+        ...prev,
+        [attributeId]: prev[attributeId].filter((o) => o.id !== id),
+      }))
+
+      message.success('Option deleted successfully')
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || 'Delete failed')
+    }
   }
 
   const handleOptionSubmit = async (values: AttributeOption) => {
@@ -104,51 +152,6 @@ const AttributesView = () => {
     }
   }
 
-  const onOptionEdit = (id: number, attributeId: number) => {
-    const option = optionsByAttributeId[attributeId]?.find((o) => o.id === id) || null
-    setActiveAttributeId(attributeId)
-    setOptionEditingData(option)
-    if (option) form.setFieldsValue(option)
-    setOptionDrawerOpen(true)
-  }
-
-  const onOptionDelete = async (id: number, attributeId: number) => {
-    try {
-      await axiosDefaultInstance.delete(`${api.deleteAttributeOption}/${id}`)
-
-      setOptionsByAttributeId((prev) => ({
-        ...prev,
-        [attributeId]: prev[attributeId].filter((o) => o.id !== id),
-      }))
-
-      message.success('Option deleted successfully')
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Delete failed')
-    }
-  }
-
-  const handleSubmit = async (values: Attribute) => {
-    try {
-      if (editingData) {
-        await axiosDefaultInstance.put(`${api.editAttribute}/${editingData.id}`, values)
-        setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
-        message.success('Updated successfully')
-      } else {
-        const res = await axiosDefaultInstance.post(api.addAttribute, values)
-        setData((prev) => {
-          const updated = [...prev, res.data]
-          updated.sort((a, b) => a.id - b.id)
-          return updated
-        })
-        message.success('Added successfully')
-      }
-      setDrawerOpen(false)
-      form.resetFields()
-    } catch (error: any) {
-      bindErrorToForm({ error, form })
-    }
-  }
-
   const fetchOptions = async (attributeId: number) => {
     setLoadingIds((prev) => new Set(prev).add(attributeId))
 
@@ -169,19 +172,19 @@ const AttributesView = () => {
   }
 
   return (
-    <>
+    <PageWrapper ref={ref}>
       <Table
+        bordered
         dataSource={data}
         loading={loading}
         columns={columns({ onAdd, onEdit, onDelete })}
         pagination={false}
+        scroll={{ y: size.height - 90 }}
         rowKey="id"
         expandable={{
           rowExpandable: (record) => record.attributeType === AttributeType.Select,
           onExpand: (expanded, record) => {
-            if (expanded && !optionsByAttributeId[record.id]) {
-              fetchOptions(record.id)
-            }
+            if (expanded && !optionsByAttributeId[record.id]) fetchOptions(record.id)
           },
           expandedRowRender: (record) => (
             <>
@@ -218,7 +221,7 @@ const AttributesView = () => {
         editingData={editingData}
         onSubmit={handleSubmit}
       />
-    </>
+    </PageWrapper>
   )
 }
 
