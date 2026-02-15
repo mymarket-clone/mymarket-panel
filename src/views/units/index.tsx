@@ -79,6 +79,7 @@ const UnitsView = () => {
   return (
     <>
       <Table
+        bordered
         dataSource={data}
         loading={loading}
         columns={columns({ onAdd, onEdit, onDelete })}

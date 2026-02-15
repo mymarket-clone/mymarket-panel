@@ -9,11 +9,10 @@ export const ActionCol = <T extends { id: number }>({
   onDelete,
 }: ActionColProps): ColumnType<T> => ({
   title: (
-    <>
+    <Space size="small">
       <span>Actions</span>
       <Tooltip title="Add">
         <Button
-          style={{ marginLeft: 7 }}
           size="small"
           icon={<PlusCircleOutlined />}
           onClick={(e) => {
@@ -22,7 +21,7 @@ export const ActionCol = <T extends { id: number }>({
           }}
         />
       </Tooltip>
-    </>
+    </Space>
   ),
   key: 'actions',
   render: (_: unknown, record: T) => (

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Drawer, Form, Input } from 'antd'
-import React, { useEffect } from 'react'
+import { Button, Drawer, Form, Input, Select, Switch } from 'antd'
+import { useEffect } from 'react'
 import { FormWrapper } from '../style'
 import type { CustomColumnType } from '../types/CustomCol'
 
@@ -65,7 +65,10 @@ const SideDrawer = <T extends Record<string, any>>({
       <Form form={form} layout="vertical" onFinish={handleFinish}>
         <FormWrapper>
           {columns
-            .filter((col: any): col is CustomColumnType<T> => 'dataIndex' in col && col.dataIndex !== 'id')
+            .filter(
+              (col: any): col is CustomColumnType<T> =>
+                'dataIndex' in col && col.dataIndex !== 'id' && col.dataIndex !== 'attributeCode'
+            )
             .map((col) => {
               const label = typeof col.title === 'function' ? (col.dataIndex as string) : col.title
 
@@ -111,11 +114,49 @@ const SideDrawer = <T extends Record<string, any>>({
               return (
                 <Form.Item
                   key={col.dataIndex as string}
-                  label={label as React.ReactNode}
+                  label={label}
                   name={col.dataIndex as string}
                   rules={rules}
+                  valuePropName={col.type === 'boolean' ? 'checked' : 'value'}
                 >
-                  <Input placeholder={`Enter ${col.title}`} />
+                  {(() => {
+                    switch (col.type) {
+                      case 'boolean':
+                        return <Switch />
+
+                      case 'lookup':
+                        return (
+                          <Select
+                            allowClear
+                            showSearch
+                            placeholder={`Select ${label}`}
+                            options={(col.lookupData || []).map((item: any) => ({
+                              label: item[col.lookup!.label],
+                              value: item[col.lookup!.value],
+                            }))}
+                          />
+                        )
+
+                      case 'enum':
+                        if (!col.enumObj) return <Input placeholder={`Enter ${label}`} />
+
+                        return (
+                          <Select
+                            allowClear
+                            placeholder={`Select ${label}`}
+                            options={Object.entries(col.enumObj).map(([value, label]) => ({
+                              label,
+                              value: Number(value),
+                            }))}
+                          />
+                        )
+
+                      case 'number':
+                      case 'string':
+                      default:
+                        return <Input placeholder={`Enter ${label}`} />
+                    }
+                  })()}
                 </Form.Item>
               )
             })}

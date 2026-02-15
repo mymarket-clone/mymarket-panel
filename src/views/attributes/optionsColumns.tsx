@@ -1,24 +1,20 @@
 import type { AttributeOption } from './type'
 import { ActionCol } from '../../components/ActionCol'
 import type { CustomColumnType } from '../../types/CustomCol'
-
-export type ColumnsProps = {
-  onAdd: () => void
-  onEdit: (id: number) => void
-  onDelete: (id: number) => void
-}
+import type { ActionColProps } from '../../types/ActionCol'
 
 export const optionColumns = ({
   onAdd,
   onEdit,
   onDelete,
-}: ColumnsProps): CustomColumnType<AttributeOption>[] => {
+}: ActionColProps): CustomColumnType<AttributeOption>[] => {
   return [
     {
       title: 'Id',
       dataIndex: 'id',
       key: 'id',
       type: 'number',
+      width: 50,
     },
     {
       title: 'Order',
@@ -26,6 +22,7 @@ export const optionColumns = ({
       key: 'order',
       required: true,
       type: 'number',
+      width: 150,
     },
     {
       title: 'Name',
@@ -33,6 +30,7 @@ export const optionColumns = ({
       key: 'name',
       required: true,
       type: 'string',
+      width: 200,
     },
     {
       title: 'NameEn',
@@ -40,6 +38,7 @@ export const optionColumns = ({
       key: 'nameEn',
       type: 'string',
       render: (v) => v || '-',
+      width: 200,
     },
     {
       title: 'NameRu',
@@ -47,6 +46,7 @@ export const optionColumns = ({
       key: 'nameRu',
       type: 'string',
       render: (v) => v || '-',
+      width: 200,
     },
     ActionCol({
       onAdd,

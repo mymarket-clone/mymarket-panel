@@ -14,6 +14,8 @@ import { optionColumns } from './optionsColumns'
 import { bindErrorToForm } from '../../utils/bindErrorToForm'
 import { useElementSize } from '@custom-react-hooks/use-element-size'
 import { PageWrapper } from '../../style'
+import { useLookup } from '../../hooks/useLookup'
+import type { Unit } from '../units/type'
 
 const AttributesView = () => {
   const { data: initialData, loading } = useFetch<Attribute[]>({
@@ -23,15 +25,17 @@ const AttributesView = () => {
 
   const [optionsByAttributeId, setOptionsByAttributeId] = useState<Record<number, AttributeOption[]>>({})
   const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set())
-  const [activeAttributeId, setActiveAttributeId] = useState<number | null>(null)
   const [ref, size] = useElementSize()
 
   const [data, setData] = useState<Attribute[]>([])
+  const [form] = Form.useForm()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [optionDrawerOpen, setOptionDrawerOpen] = useState(false)
   const [editingData, setEditingData] = useState<Attribute | null>(null)
+  const [activeAttributeId, setActiveAttributeId] = useState<number | null>(null)
   const [optionEditingData, setOptionEditingData] = useState<AttributeOption | null>(null)
-  const [form] = Form.useForm()
+
+  const units = useLookup<Unit>(api.getAllUnits)
 
   useEffect(() => {
     setData(initialData!)
@@ -59,13 +63,6 @@ const AttributesView = () => {
     }
   }
 
-  const onOptionAdd = (attributeId: number) => {
-    setActiveAttributeId(attributeId)
-    setOptionEditingData(null)
-    form.resetFields()
-    setOptionDrawerOpen(true)
-  }
-
   const handleSubmit = async (values: Attribute) => {
     try {
       if (editingData) {
@@ -86,6 +83,13 @@ const AttributesView = () => {
     } catch (error: any) {
       bindErrorToForm({ error, form })
     }
+  }
+
+  const onOptionAdd = (attributeId: number) => {
+    setActiveAttributeId(attributeId)
+    setOptionEditingData(null)
+    form.resetFields()
+    setOptionDrawerOpen(true)
   }
 
   const onOptionEdit = (id: number, attributeId: number) => {
@@ -177,7 +181,7 @@ const AttributesView = () => {
         bordered
         dataSource={data}
         loading={loading}
-        columns={columns({ onAdd, onEdit, onDelete })}
+        columns={columns({ onAdd, onEdit, onDelete, units })}
         pagination={false}
         scroll={{ y: size.height - 90 }}
         rowKey="id"
@@ -217,7 +221,7 @@ const AttributesView = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         form={form}
-        columns={columns({ onAdd, onEdit, onDelete })}
+        columns={columns({ onAdd, onEdit, onDelete, units })}
         editingData={editingData}
         onSubmit={handleSubmit}
       />

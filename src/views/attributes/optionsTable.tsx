@@ -1,11 +1,12 @@
 import { Table } from 'antd'
 import type { AttributeOption } from './type'
-import { optionColumns, type ColumnsProps } from './optionsColumns'
+import type { ActionColProps } from '../../types/ActionCol'
+import { optionColumns } from './optionsColumns'
 
 type Props = {
   data: AttributeOption[]
   loading: boolean
-} & ColumnsProps
+} & ActionColProps
 
 const AttributeOptionsTable = ({ data, loading, onAdd, onDelete, onEdit }: Props) => {
   return (
