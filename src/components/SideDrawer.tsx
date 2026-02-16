@@ -35,16 +35,16 @@ const SideDrawer = <T extends Record<string, any>>({
         const col = columns.find((c) => c.dataIndex === key)
         if (!col) return [key, value]
 
-        if ((value === '' || value == null) && !col.required) return [key, null]
-
         switch (col.type) {
           case 'number':
-            return [key, Number(value)]
+            return [key, value != null && value !== '' ? Number(value) : null]
+
           case 'boolean':
             return [key, Boolean(value)]
+
           case 'string':
           default:
-            return [key, value]
+            return [key, value != null && value !== '' ? value : null]
         }
       })
     ) as T

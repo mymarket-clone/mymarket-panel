@@ -30,6 +30,7 @@ export const categoryAttributesColumns = ({
       key: 'categoryId',
       type: 'lookup',
       width: 200,
+      required: true,
       lookupData: categories,
       lookup: { label: 'name', value: 'id' },
       render: (_, record) => {
@@ -43,6 +44,7 @@ export const categoryAttributesColumns = ({
       key: 'attributeId',
       type: 'lookup',
       width: 200,
+      required: true,
       lookupData: attributes,
       lookup: { label: 'name', value: 'id' },
       render: (_, record) => {
@@ -56,6 +58,7 @@ export const categoryAttributesColumns = ({
       key: 'order',
       width: 200,
       type: 'number',
+      required: true,
     },
     {
       title: 'Required',
