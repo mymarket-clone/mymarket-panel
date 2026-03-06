@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Drawer, Form, Input, Select, Switch } from 'antd'
+import { Button, Drawer, Form, Input, Select, Switch, Upload } from 'antd'
 import { useEffect } from 'react'
 import { FormWrapper } from '../style'
 import type { CustomColumnType } from '../types/CustomCol'
+import { UploadOutlined } from '@ant-design/icons'
 
 type DrawerProps<T> = {
   open: boolean
@@ -41,6 +42,17 @@ const SideDrawer = <T extends Record<string, any>>({
 
           case 'boolean':
             return [key, Boolean(value)]
+
+          case 'file': {
+            const list = Array.isArray(value)
+              ? value
+              : Array.isArray((value as any)?.fileList)
+                ? (value as any).fileList
+                : []
+
+            const file = list[0]?.originFileObj ?? null
+            return [key, file]
+          }
 
           case 'string':
           default:
@@ -150,6 +162,24 @@ const SideDrawer = <T extends Record<string, any>>({
                             }))}
                           />
                         )
+
+                      case 'file': {
+                        const multiple = (col as any).fileMultiple === true
+                        const accept = (col as any).fileAccept
+
+                        return (
+                          <Upload
+                            beforeUpload={() => false}
+                            multiple={multiple}
+                            accept={accept}
+                            maxCount={multiple ? undefined : 1}
+                          >
+                            <Button icon={<UploadOutlined />}>
+                              {multiple ? `Select files` : `Select file`}
+                            </Button>
+                          </Upload>
+                        )
+                      }
 
                       case 'number':
                       case 'string':

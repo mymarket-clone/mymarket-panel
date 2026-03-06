@@ -25,4 +25,5 @@ export default {
   deleteCategoryAttribute: 'categoryAttributes',
   editCategoryAttribute: 'categoryAttributes',
   addCategoryAttribute: 'categoryAttributes',
+  brands: 'brands',
 }
