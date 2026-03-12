@@ -1,8 +1,9 @@
 import { Table } from 'antd'
+
+import type { Category, CategoryAttribute } from '../../type'
+import type { Attribute } from '../../../attributes/type'
+import type { ActionColProps } from '../../../../types/ActionCol'
 import { categoryAttributesColumns } from './categoryAttributesColumns'
-import type { Category, CategoryAttribute } from './type'
-import type { ActionColProps } from '../../types/ActionCol'
-import type { Attribute } from '../attributes/type'
 
 type Props = {
   data: CategoryAttribute[]
