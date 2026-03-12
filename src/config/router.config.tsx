@@ -1,6 +1,6 @@
 import type { Route } from '../types/Route'
 import AttributesView from '../views/attributes'
-import BrandsView from '../views/brands/BrandsView'
+import BrandsView from '../views/brands'
 import CategoriesView from '../views/categories'
 import UnitsView from '../views/units'
 

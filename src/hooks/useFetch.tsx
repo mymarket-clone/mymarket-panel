@@ -11,7 +11,7 @@ type UseApiProps<
   Params = Record<string, unknown>,
   FormValues extends Record<string, unknown> = Record<string, unknown>,
 > = {
-  url: string
+  endpoint: string
   httpMethod: HttpMethod
   body?: Body
   params?: Params
@@ -27,7 +27,7 @@ export function useFetch<
   Params = Record<string, unknown>,
   FormValues extends Record<string, unknown> = Record<string, unknown>,
 >(props: UseApiProps<Body, Params, FormValues>) {
-  const { url, httpMethod, body, params, form, enabled = true } = props
+  const { endpoint, httpMethod, body, params, form, enabled = true } = props
 
   const [data, setData] = useState<Data | null>(null)
   const [loading, setLoading] = useState(false)
@@ -56,11 +56,11 @@ export function useFetch<
         const requestParams = overrideParams ?? params
 
         if (httpMethod === HttpMethod.GET || httpMethod === HttpMethod.DELETE) {
-          response = await axiosDefaultInstance[httpMethod]<ApiResponse<Data>>(url, {
+          response = await axiosDefaultInstance[httpMethod]<ApiResponse<Data>>(endpoint, {
             params: requestParams,
           })
         } else {
-          response = await axiosDefaultInstance[httpMethod]<ApiResponse<Data>>(url, requestBody)
+          response = await axiosDefaultInstance[httpMethod]<ApiResponse<Data>>(endpoint, requestBody)
         }
 
         const res: ApiResponse<Data> = response.data
@@ -88,7 +88,7 @@ export function useFetch<
         setLoading(false)
       }
     },
-    [url, httpMethod, body, params, form]
+    [endpoint, httpMethod, body, params, form]
   )
 
   useEffect(() => {
