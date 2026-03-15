@@ -29,9 +29,7 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
     try {
       setLoading(true)
 
-      const res = await axiosDefaultInstance.get('category-attributes', {
-        params: { id: categoryId },
-      })
+      const res = await axiosDefaultInstance.get(`categories/${categoryId}/attributes`)
 
       setData(res.data ?? [])
       setLoaded(true)

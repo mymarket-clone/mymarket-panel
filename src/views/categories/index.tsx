@@ -13,6 +13,7 @@ import { bindErrorToForm } from '../../utils/bindErrorToForm'
 import { useLookup } from '../../hooks/useLookup'
 import type { Attribute } from '../attributes/type'
 import CategoryAttributesTab from './components/attributes/CategoryAttributesTab'
+import CategoryBrandsTab from './components/brands/CategoryBrandsTab'
 
 const CategoriesView = () => {
   const { data: initialData, loading } = useFetch<Category[]>({
@@ -25,7 +26,7 @@ const CategoriesView = () => {
   const [editingData, setEditingData] = useState<Category | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const attributes = useLookup<Attribute>('categories')
+  const attributes = useLookup<Attribute>('attributes')
 
   useEffect(() => {
     setData(initialData!)
@@ -69,7 +70,6 @@ const CategoriesView = () => {
         await axiosDefaultInstance.put(`categories/${editingData.id}`, values)
 
         setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
-
         message.success('Updated successfully')
       } else {
         const res = await axiosDefaultInstance.post('categories', values)
@@ -117,7 +117,7 @@ const CategoriesView = () => {
                 {
                   key: 'brands',
                   label: 'Brands',
-                  children: 123,
+                  children: <CategoryBrandsTab categoryId={record.id} />,
                 },
               ]}
             />
