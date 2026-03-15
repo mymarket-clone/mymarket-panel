@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import api from '../../../../api/api'
 import { axiosDefaultInstance } from '../../../../api/axios'
 import SideDrawer from '../../../../components/SideDrawer'
 import { bindErrorToForm } from '../../../../utils/bindErrorToForm'
 import type { Attribute } from '../../../attributes/type'
 import type { Category, CategoryAttribute } from '../../type'
+import CategoryAttributesTable from './CategoryAttributesTable'
 import { categoryAttributesColumns } from './categoryAttributesColumns'
-import CategoryAttributesTable from './categoryAttributesTable'
 
 type Props = {
   categoryId: number
@@ -30,7 +29,7 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
     try {
       setLoading(true)
 
-      const res = await axiosDefaultInstance.get(api.getCategoryAttributeById, {
+      const res = await axiosDefaultInstance.get('category-attributes', {
         params: { id: categoryId },
       })
 
@@ -72,7 +71,7 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
 
   const onDelete = async (id: number) => {
     try {
-      await axiosDefaultInstance.delete(`${api.deleteCategoryAttribute}/${id}`)
+      await axiosDefaultInstance.delete(`category-attributes/${id}`)
       setData((prev) => prev.filter((x) => x.id !== id))
       message.success('Attribute deleted successfully')
     } catch (error: any) {
@@ -83,13 +82,13 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
   const handleSubmit = async (values: CategoryAttribute) => {
     try {
       if (editingData) {
-        await axiosDefaultInstance.put(`${api.editCategoryAttribute}/${editingData.id}`, values)
+        await axiosDefaultInstance.put(`category-attributes/${editingData.id}`, values)
 
         setData((prev) => prev.map((x) => (x.id === editingData.id ? { ...x, ...values } : x)))
 
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post(api.addCategoryAttribute, {
+        const res = await axiosDefaultInstance.post('category-attributes', {
           ...values,
           categoryId,
         })

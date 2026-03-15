@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import api from '../../api/api'
 import { useFetch } from '../../hooks/useFetch'
 import { HttpMethod } from '../../types/enums/HttpMethod'
 import type { Unit } from './type'
@@ -12,7 +11,7 @@ import SideDrawer from '../../components/SideDrawer'
 const UnitsView = () => {
   const { data: initialData, loading } = useFetch<Unit[]>({
     httpMethod: HttpMethod.GET,
-    url: api.getAllUnits,
+    endpoint: 'units',
   })
 
   const [data, setData] = useState<Unit[]>([])
@@ -37,7 +36,7 @@ const UnitsView = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await axiosDefaultInstance.delete(`${api.deleteUnit}/${id}`)
+      await axiosDefaultInstance.delete(`units/${id}`)
       setData((prev) => prev.filter((d) => d.id !== id))
       message.success('Deleted successfully')
     } catch (error: any) {
@@ -49,11 +48,11 @@ const UnitsView = () => {
   const handleSubmit = async (values: Unit) => {
     try {
       if (editingData) {
-        await axiosDefaultInstance.put(`${api.editUnit}/${editingData.id}`, values)
+        await axiosDefaultInstance.put(`units/${editingData.id}`, values)
         setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
         message.success('Updated successfully')
       } else {
-        await axiosDefaultInstance.post(api.addUnit, values)
+        await axiosDefaultInstance.post('units', values)
         setData((prev) => [values, ...prev])
         message.success('Added successfully')
       }

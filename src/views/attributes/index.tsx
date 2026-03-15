@@ -2,7 +2,6 @@
 import { Form, Table, message } from 'antd'
 import { columns } from './columns'
 import { axiosDefaultInstance } from '../../api/axios'
-import api from '../../api/api'
 import { useState, useEffect } from 'react'
 import type { Attribute, AttributeOption } from './type'
 import SideDrawer from '../../components/SideDrawer'
@@ -20,7 +19,7 @@ import type { Unit } from '../units/type'
 const AttributesView = () => {
   const { data: initialData, loading } = useFetch<Attribute[]>({
     httpMethod: HttpMethod.GET,
-    url: api.getAllAttributes,
+    endpoint: 'attributes',
   })
 
   const [optionsByAttributeId, setOptionsByAttributeId] = useState<Record<number, AttributeOption[]>>({})
@@ -35,7 +34,7 @@ const AttributesView = () => {
   const [activeAttributeId, setActiveAttributeId] = useState<number | null>(null)
   const [optionEditingData, setOptionEditingData] = useState<AttributeOption | null>(null)
 
-  const units = useLookup<Unit>(api.getAllUnits)
+  const units = useLookup<Unit>('units')
 
   useEffect(() => {
     setData(initialData!)
@@ -54,7 +53,7 @@ const AttributesView = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await axiosDefaultInstance.delete(`${api.deleteAttribute}/${id}`)
+      await axiosDefaultInstance.delete(`attribute/${id}`)
       setData((prev) => prev.filter((d) => d.id !== id))
       message.success('Deleted successfully')
     } catch (error: any) {
@@ -66,11 +65,11 @@ const AttributesView = () => {
   const handleSubmit = async (values: Attribute) => {
     try {
       if (editingData) {
-        await axiosDefaultInstance.put(`${api.editAttribute}/${editingData.id}`, values)
+        await axiosDefaultInstance.put(`attribute/${editingData.id}`, values)
         setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post(api.addAttribute, values)
+        const res = await axiosDefaultInstance.post('attribute', values)
         setData((prev) => {
           const updated = [...prev, res.data]
           updated.sort((a, b) => a.id - b.id)
@@ -102,7 +101,7 @@ const AttributesView = () => {
 
   const onOptionDelete = async (id: number, attributeId: number) => {
     try {
-      await axiosDefaultInstance.delete(`${api.deleteAttributeOption}/${id}`)
+      await axiosDefaultInstance.delete(`attribute-option/${id}`)
 
       setOptionsByAttributeId((prev) => ({
         ...prev,
@@ -120,7 +119,7 @@ const AttributesView = () => {
 
     try {
       if (optionEditingData) {
-        await axiosDefaultInstance.put(`${api.editAttributeOption}/${optionEditingData.id}`, values)
+        await axiosDefaultInstance.put(`attribute-option/${optionEditingData.id}`, values)
 
         setOptionsByAttributeId((prev) => ({
           ...prev,
@@ -131,7 +130,7 @@ const AttributesView = () => {
 
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post(api.addAttributeOption, {
+        const res = await axiosDefaultInstance.post('attribute-option', {
           ...values,
           attributeId: activeAttributeId,
         })
@@ -159,9 +158,7 @@ const AttributesView = () => {
   const fetchOptions = async (attributeId: number) => {
     setLoadingIds((prev) => new Set(prev).add(attributeId))
 
-    const res = await axiosDefaultInstance.get(api.getAllByIdAttributeOption, {
-      params: { id: attributeId },
-    })
+    const res = await axiosDefaultInstance.get(`attribute-option/${attributeId}`)
 
     setOptionsByAttributeId((prev) => ({
       ...prev,

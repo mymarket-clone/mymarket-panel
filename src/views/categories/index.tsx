@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useElementSize } from '@custom-react-hooks/use-element-size'
-import api from '../../api/api'
 import { useFetch } from '../../hooks/useFetch'
 import { PageWrapper } from '../../style'
 import { HttpMethod } from '../../types/enums/HttpMethod'
@@ -13,12 +12,12 @@ import { axiosDefaultInstance } from '../../api/axios'
 import { bindErrorToForm } from '../../utils/bindErrorToForm'
 import { useLookup } from '../../hooks/useLookup'
 import type { Attribute } from '../attributes/type'
-import CategoryAttributesTab from './components/attributes/categoryAttributesTab'
+import CategoryAttributesTab from './components/attributes/CategoryAttributesTab'
 
 const CategoriesView = () => {
   const { data: initialData, loading } = useFetch<Category[]>({
-    url: api.getAllCategories,
     httpMethod: HttpMethod.GET,
+    endpoint: 'categories',
   })
 
   const [data, setData] = useState<Category[]>([])
@@ -26,7 +25,7 @@ const CategoriesView = () => {
   const [editingData, setEditingData] = useState<Category | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const attributes = useLookup<Attribute>(api.getAllAttributes)
+  const attributes = useLookup<Attribute>('categories')
 
   useEffect(() => {
     setData(initialData!)
@@ -55,7 +54,7 @@ const CategoriesView = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await axiosDefaultInstance.delete(`${api.deleteCategory}/${id}`)
+      await axiosDefaultInstance.delete(`categories/${id}`)
       setData((prev) => prev.filter((d) => d.id !== id))
       message.success('Deleted successfully')
     } catch (error: any) {
@@ -67,13 +66,13 @@ const CategoriesView = () => {
   const handleSubmit = async (values: Category) => {
     try {
       if (editingData) {
-        await axiosDefaultInstance.put(`${api.editCategory}/${editingData.id}`, values)
+        await axiosDefaultInstance.put(`categories/${editingData.id}`, values)
 
         setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
 
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post(api.addCategory, values)
+        const res = await axiosDefaultInstance.post('categories', values)
 
         setData((prev) => {
           const updated = [...prev, res.data]
