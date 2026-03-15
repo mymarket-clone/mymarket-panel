@@ -1,8 +1,8 @@
-import { ActionCol } from '../../components/ActionCol'
-import type { CustomColumnType } from '../../types/CustomCol'
-import type { ActionColProps } from '../../types/ActionCol'
-import type { Category, CategoryAttribute } from './type'
-import type { Attribute } from '../attributes/type'
+import { ActionCol } from '../../../../components/ActionCol'
+import type { ActionColProps } from '../../../../types/ActionCol'
+import type { CustomColumnType } from '../../../../types/CustomCol'
+import type { Attribute } from '../../../attributes/type'
+import type { Category, CategoryAttribute } from '../../type'
 
 type CategoryAttributeExtras = {
   attributes: Attribute[]

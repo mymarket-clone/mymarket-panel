@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import api from '../../api/api'
 import { useFetch } from '../../hooks/useFetch'
 import { HttpMethod } from '../../types/enums/HttpMethod'
 import type { Brand } from './type'
@@ -12,7 +11,7 @@ import { columns } from './columns'
 const BrandsView = () => {
   const { data: initialData, loading } = useFetch<Brand[]>({
     httpMethod: HttpMethod.GET,
-    url: api.brands,
+    endpoint: 'brands',
   })
 
   const [data, setData] = useState<Brand[]>([])
@@ -54,7 +53,7 @@ const BrandsView = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await axiosDefaultInstance.delete(`${api.brands}/${id}`)
+      await axiosDefaultInstance.delete(`brands/${id}`)
       setData((prev) => prev.filter((d) => d.id !== id))
       message.success('Deleted successfully')
     } catch (error: any) {
@@ -71,13 +70,9 @@ const BrandsView = () => {
 
     try {
       if (editingData) {
-        const response = await axiosDefaultInstance.put(
-          `${api.brands}/${editingData.id}`,
-          toFormData(mapped),
-          {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          }
-        )
+        const response = await axiosDefaultInstance.put(`brands/${editingData.id}`, toFormData(mapped), {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
 
         const updatedBrand = response.data
 
@@ -85,7 +80,7 @@ const BrandsView = () => {
 
         message.success('Updated successfully')
       } else {
-        const response = await axiosDefaultInstance.post(api.brands, toFormData(mapped), {
+        const response = await axiosDefaultInstance.post('brands', toFormData(mapped), {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
 

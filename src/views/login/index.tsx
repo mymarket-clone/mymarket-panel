@@ -6,7 +6,6 @@ import { useFetch } from '../../hooks/useFetch'
 import { useNavigate } from 'react-router'
 import type { LoginForm } from './type'
 import type { User } from '../../types/User'
-import api from '../../api/api'
 import { FormWrapper } from '../../style'
 
 const LoginView = () => {
@@ -16,7 +15,7 @@ const LoginView = () => {
 
   const { loading, execute: login } = useFetch<User, LoginForm, Record<string, unknown>>({
     httpMethod: HttpMethod.POST,
-    url: api.loginUser,
+    endpoint: 'auth/login-user',
     form: form,
     enabled: false,
   })

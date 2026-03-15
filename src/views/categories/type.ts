@@ -17,3 +17,9 @@ export type CategoryAttribute = {
   order: number
   isRequired: boolean
 }
+
+export type CategoryBrand = {
+  id: number
+  categoryId: number
+  brandId: number
+}
