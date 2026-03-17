@@ -9,7 +9,7 @@ type CategoryAttributeExtras = {
   categories: Category[]
 }
 
-export const categoryAttributesColumns = ({
+export const CategoryAttributesColumns = ({
   onAdd,
   onEdit,
   onDelete,

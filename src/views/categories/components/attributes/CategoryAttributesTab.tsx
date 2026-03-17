@@ -7,7 +7,7 @@ import { bindErrorToForm } from '../../../../utils/bindErrorToForm'
 import type { Attribute } from '../../../attributes/type'
 import type { Category, CategoryAttribute } from '../../type'
 import CategoryAttributesTable from './CategoryAttributesTable'
-import { categoryAttributesColumns } from './categoryAttributesColumns'
+import { CategoryAttributesColumns } from './CategoryAttributesColumns'
 
 type Props = {
   categoryId: number
@@ -124,7 +124,7 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         form={form}
-        columns={categoryAttributesColumns({
+        columns={CategoryAttributesColumns({
           onAdd,
           onEdit,
           onDelete,

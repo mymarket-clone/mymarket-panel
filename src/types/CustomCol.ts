@@ -3,7 +3,7 @@ import type { LookupConfig } from './LookupConfig'
 
 export interface CustomColumnType<T> extends ColumnType<T> {
   required?: boolean
-  type?: 'string' | 'number' | 'boolean' | 'lookup' | 'enum' | 'file'
+  type?: 'string' | 'number' | 'boolean' | 'lookup' | 'enum' | 'file' | 'nullableBoolean'
   lookup?: LookupConfig
   lookupData?: unknown[]
   enumObj?: Record<string | number, string>

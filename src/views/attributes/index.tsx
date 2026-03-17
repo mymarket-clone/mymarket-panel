@@ -158,7 +158,7 @@ const AttributesView = () => {
   const fetchOptions = async (attributeId: number) => {
     setLoadingIds((prev) => new Set(prev).add(attributeId))
 
-    const res = await axiosDefaultInstance.get(`attribute-option/${attributeId}`)
+    const res = await axiosDefaultInstance.get(`attributes/${attributeId}/options`)
 
     setOptionsByAttributeId((prev) => ({
       ...prev,
@@ -176,12 +176,12 @@ const AttributesView = () => {
     <PageWrapper ref={ref}>
       <Table
         bordered
+        rowKey="id"
         dataSource={data}
         loading={loading}
         columns={columns({ onAdd, onEdit, onDelete, units })}
         pagination={false}
         scroll={{ y: size.height - 90 }}
-        rowKey="id"
         expandable={{
           rowExpandable: (record) => record.attributeType === AttributeType.Select,
           onExpand: (expanded, record) => {

@@ -11,6 +11,8 @@ type Props = {
 const AttributeOptionsTable = ({ data, loading, onAdd, onDelete, onEdit }: Props) => {
   return (
     <Table
+      bordered
+      rowKey="id"
       columns={optionColumns({ onAdd, onDelete, onEdit })}
       dataSource={data}
       loading={loading}

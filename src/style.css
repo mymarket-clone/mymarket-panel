@@ -39,3 +39,16 @@ input:-webkit-autofill:active {
   --white: #fff;
   --gray: rgb(217, 217, 217);
 }
+
+.ant-table-wrapper,
+.ant-spin,
+.ant-spin-container,
+.ant-spin-nested-loading,
+.ant-table-empty,
+.ant-table-container,
+.ant-table-body,
+.ant-table-body>table,
+.ant-table-tbody,
+.ant-table-placeholder {
+  height: 100%;
+}

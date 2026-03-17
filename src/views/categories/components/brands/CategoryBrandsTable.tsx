@@ -59,6 +59,7 @@ const CategoryBrandsTable = ({ categoryId, loading, brands, categoryBrands }: Pr
   return (
     <Table
       bordered
+      rowKey="id"
       columns={CategoryBrandsColumns({
         brands,
         categoryBrands: linkedCategoryBrands,
@@ -68,7 +69,6 @@ const CategoryBrandsTable = ({ categoryId, loading, brands, categoryBrands }: Pr
       dataSource={brands}
       loading={loading}
       pagination={false}
-      rowKey="id"
       scroll={{ y: 500 }}
       style={{ paddingBlock: 12 }}
     />

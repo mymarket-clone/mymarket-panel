@@ -55,7 +55,7 @@ const handle401 = async (error: any, instance: AxiosInstance): AxiosPromise<any>
   }
 
   try {
-    const refreshResponse = await axios.post(`${baseURL}/auth/refreshUser`, {
+    const refreshResponse = await axios.post(`${baseURL}/auth/refresh-user`, {
       accessToken,
       refreshToken,
     })

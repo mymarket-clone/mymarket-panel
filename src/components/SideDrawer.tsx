@@ -43,6 +43,9 @@ const SideDrawer = <T extends Record<string, any>>({
           case 'boolean':
             return [key, Boolean(value)]
 
+          case 'nullableBoolean':
+            return [key, value === undefined ? null : value]
+
           case 'file': {
             const list = Array.isArray(value)
               ? value
@@ -87,7 +90,19 @@ const SideDrawer = <T extends Record<string, any>>({
               const rules = []
 
               if (col.required) {
-                rules.push({ required: true, message: `${label} is required` })
+                rules.push({
+                  validator: (_: any, value: any) => {
+                    if (col.type === 'nullableBoolean') {
+                      return value === undefined
+                        ? Promise.reject(new Error(`${label} is required`))
+                        : Promise.resolve()
+                    }
+
+                    return value === undefined || value === null || value === ''
+                      ? Promise.reject(new Error(`${label} is required`))
+                      : Promise.resolve()
+                  },
+                })
               }
 
               if (col.type === 'number') {
@@ -101,9 +116,20 @@ const SideDrawer = <T extends Record<string, any>>({
                 })
               }
 
+              if (col.type === 'nullableBoolean') {
+                rules.push({
+                  validator: (_: any, value: boolean | null | undefined) => {
+                    if (value === undefined) return Promise.resolve()
+                    return value === true || value === false || value === null
+                      ? Promise.resolve()
+                      : Promise.reject(new Error(`${label} must be true, false, or empty`))
+                  },
+                })
+              }
+
               if (col.type === 'boolean') {
                 rules.push({
-                  validator: (_: any, value: null | undefined) => {
+                  validator: (_: any, value: boolean | null | undefined) => {
                     if (value === undefined || value === null) return Promise.resolve()
                     return typeof value === 'boolean'
                       ? Promise.resolve()
@@ -114,7 +140,7 @@ const SideDrawer = <T extends Record<string, any>>({
 
               if (col.type === 'string') {
                 rules.push({
-                  validator: (_: any, value: null | undefined) => {
+                  validator: (_: any, value: string | null | undefined) => {
                     if (value === undefined || value === null) return Promise.resolve()
                     return typeof value === 'string'
                       ? Promise.resolve()
@@ -135,6 +161,19 @@ const SideDrawer = <T extends Record<string, any>>({
                     switch (col.type) {
                       case 'boolean':
                         return <Switch />
+
+                      case 'nullableBoolean':
+                        return (
+                          <Select
+                            allowClear
+                            placeholder={`Select ${label}`}
+                            options={[
+                              { label: 'Yes', value: true },
+                              { label: 'No', value: false },
+                              { label: 'No value', value: null },
+                            ]}
+                          />
+                        )
 
                       case 'lookup':
                         return (
@@ -175,7 +214,7 @@ const SideDrawer = <T extends Record<string, any>>({
                             maxCount={multiple ? undefined : 1}
                           >
                             <Button icon={<UploadOutlined />}>
-                              {multiple ? `Select files` : `Select file`}
+                              {multiple ? 'Select files' : 'Select file'}
                             </Button>
                           </Upload>
                         )
@@ -191,6 +230,7 @@ const SideDrawer = <T extends Record<string, any>>({
               )
             })}
         </FormWrapper>
+
         <Form.Item>
           <Button htmlType="submit" type="primary">
             {editingData ? 'Update' : 'Add'}
