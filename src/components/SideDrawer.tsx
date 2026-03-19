@@ -156,6 +156,7 @@ const SideDrawer = <T extends Record<string, any>>({
                   name={col.dataIndex as string}
                   rules={rules}
                   valuePropName={col.type === 'boolean' ? 'checked' : 'value'}
+                  required={col.required}
                 >
                   {(() => {
                     switch (col.type) {

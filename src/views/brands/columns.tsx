@@ -24,6 +24,7 @@ export const columns = ({ onAdd, onEdit, onDelete }: ActionColProps): CustomColu
       dataIndex: 'logoUrl',
       key: 'logoUrl',
       width: 200,
+      required: true,
       type: 'file',
       render: (v) => (
         <ImgWrapper>

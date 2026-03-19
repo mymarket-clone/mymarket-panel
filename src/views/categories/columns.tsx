@@ -4,6 +4,7 @@ import type { ActionColProps } from '../../types/ActionCol'
 import type { Category } from './type'
 import { getEnumLabels } from '../../utils/getEnumlabels'
 import { CategoryPostType } from '../../types/enums/CategoryPostType'
+import { Img, ImgWrapper } from '../brands/styles'
 
 type CategoryExtras = {
   categories: Category[]
@@ -34,6 +35,7 @@ export const columns = ({
         const attr = categories.find((a) => a.id === record.parentId)
         return attr?.name ?? record.parentId ?? '-'
       },
+      sorter: (a, b) => (a.parentId ?? 0) - (b.parentId ?? 0),
     },
     {
       title: 'Name',
@@ -41,6 +43,7 @@ export const columns = ({
       key: 'name',
       required: true,
       width: 200,
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'NameEn',
@@ -55,6 +58,14 @@ export const columns = ({
       key: 'nameRu',
       width: 200,
       render: (v) => v || '-',
+    },
+    {
+      title: 'Logo',
+      dataIndex: 'logoUrl',
+      key: 'logoUrl',
+      width: 200,
+      type: 'file',
+      render: (v) => <ImgWrapper>{v ? <Img src={v} /> : '-'}</ImgWrapper>,
     },
     {
       title: 'BrandRequired',

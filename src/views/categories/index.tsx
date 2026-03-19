@@ -14,6 +14,7 @@ import { useLookup } from '../../hooks/useLookup'
 import type { Attribute } from '../attributes/type'
 import CategoryAttributesTab from './components/attributes/CategoryAttributesTab'
 import CategoryBrandsTab from './components/brands/CategoryBrandsTab'
+import { toFormData } from 'axios'
 
 const CategoriesView = () => {
   const { data: initialData, loading } = useFetch<Category[]>({
@@ -65,14 +66,25 @@ const CategoriesView = () => {
   }
 
   const handleSubmit = async (values: Category) => {
+    const mapped = {
+      ...values,
+      logo: values.logoUrl,
+    }
+
     try {
       if (editingData) {
-        await axiosDefaultInstance.put(`categories/${editingData.id}`, values)
+        // await axiosDefaultInstance.put(`categories/${editingData.id}`, values)
+
+        await axiosDefaultInstance.put(`categories/${editingData.id}`, toFormData(mapped), {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
 
         setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post('categories', values)
+        const res = await axiosDefaultInstance.post('categories', toFormData(mapped), {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
 
         setData((prev) => {
           const updated = [...prev, res.data]

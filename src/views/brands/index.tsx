@@ -7,6 +7,7 @@ import { Form, message, Table } from 'antd'
 import { axiosDefaultInstance } from '../../api/axios'
 import SideDrawer from '../../components/SideDrawer'
 import { columns } from './columns'
+import { toFormData } from 'axios'
 
 const BrandsView = () => {
   const { data: initialData, loading } = useFetch<Brand[]>({
@@ -22,23 +23,6 @@ const BrandsView = () => {
   useEffect(() => {
     setData(initialData!)
   }, [initialData])
-
-  const toFormData = (values: any) => {
-    const fd = new FormData()
-
-    Object.entries(values).forEach(([k, v]) => {
-      if (v === undefined || v === null) return
-
-      if (v instanceof File) {
-        fd.append(k, v)
-        return
-      }
-
-      fd.append(k, String(v))
-    })
-
-    return fd
-  }
 
   const onAdd = () => {
     setEditingData(null)
