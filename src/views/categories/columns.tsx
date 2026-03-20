@@ -18,10 +18,15 @@ export const columns = ({
 }: ActionColProps<CategoryExtras>): CustomColumnType<Category>[] => {
   return [
     {
+      title: '',
+      key: 'expand',
+      width: 40,
+    },
+    {
       title: 'Id',
       dataIndex: 'id',
       key: 'id',
-      width: 50,
+      width: 80,
     },
     {
       title: 'Parent',
@@ -30,6 +35,7 @@ export const columns = ({
       width: 200,
       type: 'lookup',
       lookupData: categories,
+      tree: true,
       lookup: { label: 'name', value: 'id' },
       render: (_, record) => {
         const attr = categories.find((a) => a.id === record.parentId)
@@ -49,6 +55,7 @@ export const columns = ({
       title: 'NameEn',
       dataIndex: 'nameEn',
       key: 'nameEn',
+      required: true,
       width: 200,
       render: (v) => v || '-',
     },
@@ -56,6 +63,7 @@ export const columns = ({
       title: 'NameRu',
       dataIndex: 'nameRu',
       key: 'nameRu',
+      required: true,
       width: 200,
       render: (v) => v || '-',
     },
@@ -63,7 +71,7 @@ export const columns = ({
       title: 'Logo',
       dataIndex: 'logoUrl',
       key: 'logoUrl',
-      width: 200,
+      width: 100,
       type: 'file',
       render: (v) => <ImgWrapper>{v ? <Img src={v} /> : '-'}</ImgWrapper>,
     },
@@ -71,9 +79,16 @@ export const columns = ({
       title: 'BrandRequired',
       dataIndex: 'brandRequired',
       key: 'brandRequired',
-      required: true,
-      type: 'nullableBoolean',
-      width: 200,
+      type: 'boolean',
+      width: 120,
+      render: (v) => (v === true ? 'True' : v === false ? 'False' : 'Unset'),
+    },
+    {
+      title: 'BrandVisible',
+      dataIndex: 'brandVisible',
+      key: 'brandVisible',
+      type: 'boolean',
+      width: 120,
       render: (v) => (v === true ? 'True' : v === false ? 'False' : 'Unset'),
     },
     {
@@ -81,7 +96,7 @@ export const columns = ({
       dataIndex: 'categoryPostType',
       key: 'categoryPostType',
       type: 'enum',
-      width: 200,
+      width: 100,
       enumObj: getEnumLabels(CategoryPostType),
       render: (v: number) => getEnumLabels(CategoryPostType)[v] ?? 'Unknown',
       required: true,

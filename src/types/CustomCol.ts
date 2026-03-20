@@ -7,4 +7,5 @@ export interface CustomColumnType<T> extends ColumnType<T> {
   lookup?: LookupConfig
   lookupData?: unknown[]
   enumObj?: Record<string | number, string>
+  tree?: boolean
 }

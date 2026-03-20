@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Drawer, Form, Input, Select, Switch, Upload } from 'antd'
+import { Button, Drawer, Form, Input, Select, Switch, TreeSelect, Upload } from 'antd'
 import { useEffect } from 'react'
 import { FormWrapper } from '../style'
 import type { CustomColumnType } from '../types/CustomCol'
 import { UploadOutlined } from '@ant-design/icons'
+import { buildTreeOptions } from '../helpers/buildTreeOptions'
 
 type DrawerProps<T> = {
   open: boolean
@@ -176,18 +177,37 @@ const SideDrawer = <T extends Record<string, any>>({
                           />
                         )
 
-                      case 'lookup':
-                        return (
-                          <Select
-                            allowClear
-                            showSearch
-                            placeholder={`Select ${label}`}
-                            options={(col.lookupData || []).map((item: any) => ({
-                              label: item[col.lookup!.label],
-                              value: item[col.lookup!.value],
-                            }))}
-                          />
+                      case 'lookup': {
+                        const options = (col.lookupData || []).map((item: any) => ({
+                          label: item[col.lookup!.label],
+                          value: item[col.lookup!.value],
+                        }))
+
+                        const treeData = buildTreeOptions(
+                          (col.lookupData as any) || [],
+                          col.lookup!.label,
+                          col.lookup!.value,
+                          'parentId'
                         )
+
+                        return col.tree ? (
+                          <TreeSelect
+                            allowClear
+                            treeDefaultExpandAll
+                            placeholder={`Select ${label}`}
+                            treeData={treeData}
+                            fieldNames={{ label: 'title', value: 'value', children: 'children' }}
+                            showSearch={{
+                              filterTreeNode: (inputValue, treeNode) =>
+                                String(treeNode.title ?? '')
+                                  .toLowerCase()
+                                  .includes(inputValue.toLowerCase()),
+                            }}
+                          />
+                        ) : (
+                          <Select allowClear showSearch placeholder={`Select ${label}`} options={options} />
+                        )
+                      }
 
                       case 'enum':
                         if (!col.enumObj) return <Input placeholder={`Enter ${label}`} />

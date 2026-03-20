@@ -9,6 +9,9 @@ export type Category = {
   hasChildren: boolean
   categoryPostType: CategoryPostType
   logoUrl: string
+  logo?: string
+  brandRequired: boolean
+  brandVisible: boolean
 }
 
 export type CategoryAttribute = {

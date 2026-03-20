@@ -52,3 +52,7 @@ input:-webkit-autofill:active {
 .ant-table-placeholder {
   height: 100%;
 }
+
+.ant-select-dropdown {
+  z-index: 99999999;
+}
