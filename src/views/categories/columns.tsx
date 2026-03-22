@@ -18,11 +18,6 @@ export const columns = ({
 }: ActionColProps<CategoryExtras>): CustomColumnType<Category>[] => {
   return [
     {
-      title: '',
-      key: 'expand',
-      width: 40,
-    },
-    {
       title: 'Id',
       dataIndex: 'id',
       key: 'id',

@@ -19,10 +19,10 @@ import { columns } from './columns'
 import { homeCategoriesColumns } from './homeCategoriesColumns'
 import { toFormData } from 'axios'
 import { useSearchParams } from 'react-router'
-
-type CategoryTree = Category & {
-  children?: CategoryTree[]
-}
+import CategoryAttributesTab from './components/attributes/CategoryAttributesTab'
+import CategoryBrandsTab from './components/brands/CategoryBrandsTab'
+import { useLookup } from '../../hooks/useLookup'
+import type { Attribute } from '../attributes/type'
 
 export type HomeCategory = {
   id: number
@@ -84,40 +84,6 @@ const Row = (props: RowProps) => {
       <tr {...props} ref={setNodeRef} style={style} {...attributes} />
     </RowContext.Provider>
   )
-}
-
-const buildCategoryTree = (categories?: Category[] | null): CategoryTree[] => {
-  if (!categories?.length) return []
-
-  const map = new Map<number, CategoryTree>()
-
-  categories.forEach((item) => {
-    map.set(item.id, { ...item, children: [] })
-  })
-
-  const roots: CategoryTree[] = []
-
-  map.forEach((item) => {
-    if (item.parentId == null) {
-      roots.push(item)
-      return
-    }
-
-    const parent = map.get(item.parentId)
-    if (parent) {
-      parent.children!.push(item)
-    } else {
-      roots.push(item)
-    }
-  })
-
-  const cleanEmptyChildren = (nodes: CategoryTree[]): CategoryTree[] =>
-    nodes.map((node) => ({
-      ...node,
-      children: node.children && node.children.length > 0 ? cleanEmptyChildren(node.children) : undefined,
-    }))
-
-  return cleanEmptyChildren(roots)
 }
 
 const buildCategoryTreeSelect = (categories?: Category[] | null): CategoryTreeSelectNode[] => {
@@ -201,6 +167,8 @@ const CategoriesView = () => {
   const [homeCategories, setHomeCategories] = useState<HomeCategory[]>([])
   const [homeCategoriesLoading, setHomeCategoriesLoading] = useState(false)
 
+  const attributes = useLookup<Attribute>('attributes')
+
   useEffect(() => {
     setData(initialData ?? [])
   }, [initialData])
@@ -224,7 +192,8 @@ const CategoriesView = () => {
   const [ref, size] = useElementSize()
   const [refInner, sizeInner] = useElementSize()
 
-  const treeData = useMemo(() => buildCategoryTree(data), [data])
+  const rootCategories = useMemo(() => data.filter((x) => x.parentId == null), [data])
+
   const homeCategoryTreeData = useMemo(() => buildCategoryTreeSelect(data), [data])
 
   const selectedHomeCategoryIds = useMemo(() => homeCategories.map((x) => x.categoryId), [homeCategories])
@@ -387,6 +356,47 @@ const CategoriesView = () => {
     }
   }
 
+  const renderExpandedContent = (record: Category): React.ReactNode => {
+    if (!record.hasChildren) {
+      return (
+        <Tabs
+          type="card"
+          defaultActiveKey="attributes"
+          items={[
+            {
+              key: 'attributes',
+              label: 'Attributes',
+              children: (
+                <CategoryAttributesTab categoryId={record.id} categories={data} attributes={attributes} />
+              ),
+            },
+            {
+              key: 'brands',
+              label: 'Brands',
+              children: <CategoryBrandsTab categoryId={record.id} />,
+            },
+          ]}
+        />
+      )
+    }
+
+    const children = data.filter((x) => x.parentId === record.id)
+
+    return (
+      <Table
+        rowKey="id"
+        bordered
+        pagination={false}
+        dataSource={children}
+        columns={columns({ onAdd, onEdit, onDelete, categories: data })}
+        expandable={{
+          expandedRowRender: renderExpandedContent,
+          rowExpandable: () => true,
+        }}
+      />
+    )
+  }
+
   return (
     <PageWrapper ref={ref}>
       <Tabs
@@ -404,11 +414,15 @@ const CategoriesView = () => {
                 <Table
                   rowKey="id"
                   bordered
-                  dataSource={treeData}
+                  dataSource={rootCategories}
                   loading={loading}
                   columns={columns({ onAdd, onEdit, onDelete, categories: data })}
                   pagination={false}
                   scroll={{ y: size.height - 150 }}
+                  expandable={{
+                    expandedRowRender: renderExpandedContent,
+                    rowExpandable: () => true,
+                  }}
                 />
 
                 <SideDrawer
