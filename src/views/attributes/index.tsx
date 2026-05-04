@@ -53,7 +53,7 @@ const AttributesView = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await axiosDefaultInstance.delete(`attribute/${id}`)
+      await axiosDefaultInstance.delete(`attributes/${id}`)
       setData((prev) => prev.filter((d) => d.id !== id))
       message.success('Deleted successfully')
     } catch (error: any) {
@@ -65,11 +65,11 @@ const AttributesView = () => {
   const handleSubmit = async (values: Attribute) => {
     try {
       if (editingData) {
-        await axiosDefaultInstance.put(`attribute/${editingData.id}`, values)
+        await axiosDefaultInstance.put(`attributes/${editingData.id}`, values)
         setData((prev) => prev.map((d) => (d.id === editingData.id ? { ...d, ...values } : d)))
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post('attribute', values)
+        const res = await axiosDefaultInstance.post('attributes', values)
         setData((prev) => {
           const updated = [...prev, res.data]
           updated.sort((a, b) => a.id - b.id)
@@ -101,7 +101,7 @@ const AttributesView = () => {
 
   const onOptionDelete = async (id: number, attributeId: number) => {
     try {
-      await axiosDefaultInstance.delete(`attribute-option/${id}`)
+      await axiosDefaultInstance.delete(`attribute-options/${id}`)
 
       setOptionsByAttributeId((prev) => ({
         ...prev,
@@ -119,7 +119,7 @@ const AttributesView = () => {
 
     try {
       if (optionEditingData) {
-        await axiosDefaultInstance.put(`attribute-option/${optionEditingData.id}`, values)
+        await axiosDefaultInstance.put(`attribute-options/${optionEditingData.id}`, values)
 
         setOptionsByAttributeId((prev) => ({
           ...prev,
@@ -130,7 +130,7 @@ const AttributesView = () => {
 
         message.success('Updated successfully')
       } else {
-        const res = await axiosDefaultInstance.post('attribute-option', {
+        const res = await axiosDefaultInstance.post('attribute-options', {
           ...values,
           attributeId: activeAttributeId,
         })
