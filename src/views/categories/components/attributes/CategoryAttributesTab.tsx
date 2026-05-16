@@ -8,14 +8,23 @@ import type { Attribute } from '../../../attributes/type'
 import type { Category, CategoryAttribute } from '../../type'
 import CategoryAttributesTable from './CategoryAttributesTable'
 import { CategoryAttributesColumns } from './CategoryAttributesColumns'
+import type { PermissionsType } from '../../../../types/enums/PermissionsType'
 
 type Props = {
   categoryId: number
   categories: Category[]
   attributes: Attribute[]
+  userPermissions: PermissionsType[]
+  isSuperAdmin: boolean
 }
 
-const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) => {
+const CategoryAttributesTab = ({
+  categoryId,
+  categories,
+  attributes,
+  userPermissions,
+  isSuperAdmin,
+}: Props) => {
   const [form] = Form.useForm()
 
   const [loading, setLoading] = useState(false)
@@ -118,6 +127,8 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
         onDelete={onDelete}
         attributes={attributes}
         categories={categories}
+        userPermissions={userPermissions}
+        isSuperAdmin={isSuperAdmin}
       />
 
       <SideDrawer
@@ -130,6 +141,8 @@ const CategoryAttributesTab = ({ categoryId, categories, attributes }: Props) =>
           onDelete,
           attributes,
           categories,
+          userPermissions,
+          isSuperAdmin,
         })}
         editingData={editingData}
         onSubmit={handleSubmit}

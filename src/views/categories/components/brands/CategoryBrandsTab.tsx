@@ -5,12 +5,15 @@ import { useCallback, useEffect, useState } from 'react'
 import { axiosDefaultInstance } from '../../../../api/axios'
 import CategoryBrandsTable from './CategoryBrandsTable'
 import type { Brand } from '../../../brands/type'
+import type { PermissionsType } from '../../../../types/enums/PermissionsType'
 
 type Props = {
   categoryId: number
+  userPermissions: PermissionsType[]
+  isSuperAdmin: boolean
 }
 
-const CategoryBrandsTab = ({ categoryId }: Props) => {
+const CategoryBrandsTab = ({ categoryId, userPermissions, isSuperAdmin }: Props) => {
   const { message } = App.useApp()
 
   const [loading, setLoading] = useState(false)
@@ -51,6 +54,8 @@ const CategoryBrandsTab = ({ categoryId }: Props) => {
         categoryBrands={categoryBrands}
         loading={loading}
         brands={brands}
+        userPermissions={userPermissions}
+        isSuperAdmin={isSuperAdmin}
       />
     </>
   )

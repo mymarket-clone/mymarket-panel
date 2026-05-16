@@ -2,7 +2,7 @@
 import { Form, Table, message } from 'antd'
 import { columns } from './columns'
 import { axiosDefaultInstance } from '../../api/axios'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { Attribute, AttributeOption } from './type'
 import SideDrawer from '../../components/SideDrawer'
 import { useFetch } from '../../hooks/useFetch'
@@ -15,12 +15,19 @@ import { useElementSize } from '@custom-react-hooks/use-element-size'
 import { PageWrapper } from '../../style'
 import { useLookup } from '../../hooks/useLookup'
 import type { Unit } from '../units/type'
+import { useUserStore } from '../../stores/userStore'
+import { getPermissions } from '../../helpers/getPermission'
+import { isSuperAdmin } from '../../helpers/getAccessLevel'
 
 const AttributesView = () => {
   const { data: initialData, loading } = useFetch<Attribute[]>({
     httpMethod: HttpMethod.GET,
     endpoint: 'attributes',
   })
+
+  const accessToken = useUserStore((s) => s.accessToken)
+  const userPermissions = useMemo(() => (accessToken ? getPermissions(accessToken) : []), [accessToken])
+  const superAdmin = isSuperAdmin(accessToken)
 
   const [optionsByAttributeId, setOptionsByAttributeId] = useState<Record<number, AttributeOption[]>>({})
   const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set())
@@ -179,7 +186,7 @@ const AttributesView = () => {
         rowKey="id"
         dataSource={data}
         loading={loading}
-        columns={columns({ onAdd, onEdit, onDelete, units })}
+        columns={columns({ onAdd, onEdit, onDelete, units, userPermissions, isSuperAdmin: superAdmin })}
         pagination={false}
         scroll={{ y: size.height - 90 }}
         expandable={{
@@ -195,6 +202,8 @@ const AttributesView = () => {
                 onAdd={() => onOptionAdd(record.id)}
                 onEdit={(id) => onOptionEdit(id, record.id)}
                 onDelete={(id) => onOptionDelete(id, record.id)}
+                userPermissions={userPermissions}
+                isSuperAdmin={superAdmin}
               />
 
               <SideDrawer
@@ -205,6 +214,8 @@ const AttributesView = () => {
                   onAdd: () => onOptionAdd(record.id),
                   onEdit: (id) => onOptionEdit(id, record.id),
                   onDelete: (id) => onOptionDelete(id, record.id),
+                  userPermissions,
+                  isSuperAdmin: superAdmin,
                 })}
                 editingData={optionEditingData}
                 onSubmit={handleOptionSubmit}
@@ -218,7 +229,7 @@ const AttributesView = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         form={form}
-        columns={columns({ onAdd, onEdit, onDelete, units })}
+        columns={columns({ onAdd, onEdit, onDelete, units, userPermissions, isSuperAdmin: superAdmin })}
         editingData={editingData}
         onSubmit={handleSubmit}
       />

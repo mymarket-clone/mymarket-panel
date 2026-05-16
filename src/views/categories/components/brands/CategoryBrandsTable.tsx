@@ -4,23 +4,37 @@ import type { Brand } from '../../../brands/type'
 import type { CategoryBrand } from '../../type'
 import { CategoryBrandsColumns } from './CategoryBrandsColumns'
 import { axiosDefaultInstance } from '../../../../api/axios'
+import { PermissionsType } from '../../../../types/enums/PermissionsType'
+import { hasPermission } from '../../../../helpers/hasPermission'
 
 type Props = {
   categoryId: number
   loading: boolean
   brands: Brand[]
   categoryBrands: CategoryBrand[]
+  userPermissions: PermissionsType[]
+  isSuperAdmin: boolean
 }
 
-const CategoryBrandsTable = ({ categoryId, loading, brands, categoryBrands }: Props) => {
+const CategoryBrandsTable = ({
+  categoryId,
+  loading,
+  brands,
+  categoryBrands,
+  userPermissions,
+  isSuperAdmin,
+}: Props) => {
   const [linkedCategoryBrands, setLinkedCategoryBrands] = useState<CategoryBrand[]>(categoryBrands)
   const [loadingByBrandId, setLoadingByBrandId] = useState<Record<number, boolean>>({})
+  const canEdit = isSuperAdmin || hasPermission(PermissionsType.CategoriesEdit, userPermissions)
 
   useEffect(() => {
     setLinkedCategoryBrands(categoryBrands)
   }, [categoryBrands])
 
   const linkUnlinkBrand = async (brandId: number, checked: boolean) => {
+    if (!canEdit) return
+
     try {
       setLoadingByBrandId((prev) => ({ ...prev, [brandId]: true }))
 
@@ -65,6 +79,7 @@ const CategoryBrandsTable = ({ categoryId, loading, brands, categoryBrands }: Pr
         categoryBrands: linkedCategoryBrands,
         onToggle: linkUnlinkBrand,
         loadingByBrandId,
+        canEdit,
       })}
       dataSource={brands}
       loading={loading}

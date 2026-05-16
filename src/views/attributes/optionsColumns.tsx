@@ -2,13 +2,16 @@ import type { AttributeOption } from './type'
 import { ActionCol } from '../../components/ActionCol'
 import type { CustomColumnType } from '../../types/CustomCol'
 import type { ActionColProps } from '../../types/ActionCol'
+import { PermissionsType } from '../../types/enums/PermissionsType'
 
 export const optionColumns = ({
   onAdd,
   onEdit,
   onDelete,
+  userPermissions,
+  isSuperAdmin,
 }: ActionColProps): CustomColumnType<AttributeOption>[] => {
-  return [
+  const cols: CustomColumnType<AttributeOption>[] = [
     {
       title: 'Id',
       dataIndex: 'id',
@@ -48,10 +51,22 @@ export const optionColumns = ({
       render: (v) => v || '-',
       width: 200,
     },
-    ActionCol({
-      onAdd,
-      onEdit,
-      onDelete,
-    }),
   ]
+
+  const actionCol = ActionCol<AttributeOption>({
+    onAdd,
+    onEdit,
+    onDelete,
+    userPermissions,
+    isSuperAdmin,
+    actionPermissions: {
+      add: PermissionsType.AttributeAdd,
+      edit: PermissionsType.AttributeEdit,
+      delete: PermissionsType.AttributeDelete,
+    },
+  })
+
+  if (actionCol) cols.push(actionCol)
+
+  return cols
 }

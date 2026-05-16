@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useFetch } from '../../hooks/useFetch'
 import { HttpMethod } from '../../types/enums/HttpMethod'
 import type { Unit } from './type'
@@ -7,12 +7,19 @@ import { Form, message, Table } from 'antd'
 import { axiosDefaultInstance } from '../../api/axios'
 import { columns } from './columns'
 import SideDrawer from '../../components/SideDrawer'
+import { useUserStore } from '../../stores/userStore'
+import { getPermissions } from '../../helpers/getPermission'
+import { isSuperAdmin } from '../../helpers/getAccessLevel'
 
 const UnitsView = () => {
   const { data: initialData, loading } = useFetch<Unit[]>({
     httpMethod: HttpMethod.GET,
     endpoint: 'units',
   })
+
+  const accessToken = useUserStore((s) => s.accessToken)
+  const userPermissions = useMemo(() => (accessToken ? getPermissions(accessToken) : []), [accessToken])
+  const superAdmin = isSuperAdmin(accessToken)
 
   const [data, setData] = useState<Unit[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -81,7 +88,7 @@ const UnitsView = () => {
         bordered
         dataSource={data}
         loading={loading}
-        columns={columns({ onAdd, onEdit, onDelete })}
+        columns={columns({ onAdd, onEdit, onDelete, userPermissions, isSuperAdmin: superAdmin })}
         pagination={false}
         rowKey="id"
       />
@@ -90,7 +97,7 @@ const UnitsView = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         form={form}
-        columns={columns({ onAdd, onEdit, onDelete })}
+        columns={columns({ onAdd, onEdit, onDelete, userPermissions, isSuperAdmin: superAdmin })}
         editingData={editingData}
         onSubmit={handleSubmit}
       />

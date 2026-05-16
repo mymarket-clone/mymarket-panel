@@ -1,6 +1,7 @@
 import { ActionCol } from '../../../../components/ActionCol'
 import type { ActionColProps } from '../../../../types/ActionCol'
 import type { CustomColumnType } from '../../../../types/CustomCol'
+import { PermissionsType } from '../../../../types/enums/PermissionsType'
 import type { Attribute } from '../../../attributes/type'
 import type { Category, CategoryAttribute } from '../../type'
 
@@ -15,8 +16,10 @@ export const CategoryAttributesColumns = ({
   onDelete,
   attributes,
   categories,
+  userPermissions,
+  isSuperAdmin,
 }: ActionColProps<CategoryAttributeExtras>): CustomColumnType<CategoryAttribute>[] => {
-  return [
+  const cols: CustomColumnType<CategoryAttribute>[] = [
     {
       title: 'Id',
       dataIndex: 'id',
@@ -68,10 +71,22 @@ export const CategoryAttributesColumns = ({
       type: 'boolean',
       render: (v) => (v ? 'Yes' : 'No'),
     },
-    ActionCol({
-      onAdd,
-      onEdit,
-      onDelete,
-    }),
   ]
+
+  const actionCol = ActionCol<CategoryAttribute>({
+    onAdd,
+    onEdit,
+    onDelete,
+    userPermissions,
+    isSuperAdmin,
+    actionPermissions: {
+      add: PermissionsType.CategoriesEdit,
+      edit: PermissionsType.CategoriesEdit,
+      delete: PermissionsType.CategoriesEdit,
+    },
+  })
+
+  if (actionCol) cols.push(actionCol)
+
+  return cols
 }

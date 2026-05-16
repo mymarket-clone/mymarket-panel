@@ -8,12 +8,20 @@ type Props = {
   loading: boolean
 } & ActionColProps
 
-const AttributeOptionsTable = ({ data, loading, onAdd, onDelete, onEdit }: Props) => {
+const AttributeOptionsTable = ({
+  data,
+  loading,
+  onAdd,
+  onDelete,
+  onEdit,
+  userPermissions,
+  isSuperAdmin,
+}: Props) => {
   return (
     <Table
       bordered
       rowKey="id"
-      columns={optionColumns({ onAdd, onDelete, onEdit })}
+      columns={optionColumns({ onAdd, onDelete, onEdit, userPermissions, isSuperAdmin })}
       dataSource={data}
       loading={loading}
       pagination={false}

@@ -5,6 +5,7 @@ import type { Category } from './type'
 import { getEnumLabels } from '../../utils/getEnumlabels'
 import { CategoryPostType } from '../../types/enums/CategoryPostType'
 import { Img, ImgWrapper } from '../brands/styles'
+import { PermissionsType } from '../../types/enums/PermissionsType'
 
 type CategoryExtras = {
   categories: Category[]
@@ -15,8 +16,10 @@ export const columns = ({
   onEdit,
   onDelete,
   categories,
+  userPermissions,
+  isSuperAdmin,
 }: ActionColProps<CategoryExtras>): CustomColumnType<Category>[] => {
-  return [
+  const cols: CustomColumnType<Category>[] = [
     {
       title: 'Id',
       dataIndex: 'id',
@@ -96,10 +99,22 @@ export const columns = ({
       render: (v: number) => getEnumLabels(CategoryPostType)[v] ?? 'Unknown',
       required: true,
     },
-    ActionCol({
-      onAdd,
-      onEdit,
-      onDelete,
-    }),
   ]
+
+  const actionCol = ActionCol<Category>({
+    onAdd,
+    onEdit,
+    onDelete,
+    userPermissions,
+    isSuperAdmin,
+    actionPermissions: {
+      add: PermissionsType.CategoriesAdd,
+      edit: PermissionsType.CategoriesEdit,
+      delete: PermissionsType.CategoriesDelete,
+    },
+  })
+
+  if (actionCol) cols.push(actionCol)
+
+  return cols
 }

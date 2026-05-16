@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ComponentType, PropsWithChildren } from 'react'
+import type { PermissionsType } from './enums/PermissionsType'
 
 export type Route = {
   path: string
@@ -9,4 +10,6 @@ export type Route = {
   provider?: ComponentType<PropsWithChildren>
   guard?: boolean
   redirectTo?: string | ((options?: unknown) => string)
+  permission?: PermissionsType | PermissionsType[]
+  superAdminRequired?: boolean
 }

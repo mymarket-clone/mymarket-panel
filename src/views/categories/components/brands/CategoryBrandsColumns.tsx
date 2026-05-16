@@ -8,6 +8,7 @@ type CategoryBrandsExtras = {
   categoryBrands: CategoryBrand[]
   onToggle: (brandId: number, checked: boolean) => void | Promise<void>
   loadingByBrandId: Record<number, boolean>
+  canEdit: boolean
 }
 
 export const CategoryBrandsColumns = ({
@@ -15,6 +16,7 @@ export const CategoryBrandsColumns = ({
   categoryBrands,
   onToggle,
   loadingByBrandId,
+  canEdit,
 }: CategoryBrandsExtras): CustomColumnType<Brand>[] => {
   return [
     {
@@ -36,6 +38,7 @@ export const CategoryBrandsColumns = ({
         return (
           <Switch
             checked={checked}
+            disabled={!canEdit}
             loading={loadingByBrandId[record.id]}
             onChange={(nextChecked) => onToggle(record.id, nextChecked)}
           />

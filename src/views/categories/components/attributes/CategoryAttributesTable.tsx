@@ -20,12 +20,22 @@ const CategoryAttributesTable = ({
   onEdit,
   attributes,
   categories,
+  userPermissions,
+  isSuperAdmin,
 }: Props) => {
   return (
     <Table
       bordered
       rowKey="id"
-      columns={CategoryAttributesColumns({ onAdd, onDelete, onEdit, attributes, categories })}
+      columns={CategoryAttributesColumns({
+        onAdd,
+        onDelete,
+        onEdit,
+        attributes,
+        categories,
+        userPermissions,
+        isSuperAdmin,
+      })}
       dataSource={data}
       loading={loading}
       pagination={false}

@@ -5,6 +5,7 @@ import { AttributeType } from '../../types/enums/AttributeType'
 import type { ActionColProps } from '../../types/ActionCol'
 import { getEnumLabels } from '../../utils/getEnumlabels'
 import type { Unit } from '../units/type'
+import { PermissionsType } from '../../types/enums/PermissionsType'
 
 type AttributesExtras = {
   units: Unit[]
@@ -15,8 +16,10 @@ export const columns = ({
   onEdit,
   onDelete,
   units,
+  userPermissions,
+  isSuperAdmin,
 }: ActionColProps<AttributesExtras>): CustomColumnType<Attribute>[] => {
-  return [
+  const cols: CustomColumnType<Attribute>[] = [
     {
       title: 'Id',
       dataIndex: 'id',
@@ -74,10 +77,22 @@ export const columns = ({
       },
       width: 80,
     },
-    ActionCol({
-      onAdd,
-      onEdit,
-      onDelete,
-    }),
   ]
+
+  const actionCol = ActionCol<Attribute>({
+    onAdd,
+    onEdit,
+    onDelete,
+    userPermissions,
+    isSuperAdmin,
+    actionPermissions: {
+      add: PermissionsType.AttributeAdd,
+      edit: PermissionsType.AttributeEdit,
+      delete: PermissionsType.AttributeDelete,
+    },
+  })
+
+  if (actionCol) cols.push(actionCol)
+
+  return cols
 }

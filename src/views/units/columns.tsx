@@ -1,10 +1,17 @@
 import { ActionCol } from '../../components/ActionCol'
 import type { ActionColProps } from '../../types/ActionCol'
 import type { CustomColumnType } from '../../types/CustomCol'
+import { PermissionsType } from '../../types/enums/PermissionsType'
 import type { Unit } from './type'
 
-export const columns = ({ onAdd, onEdit, onDelete }: ActionColProps): CustomColumnType<Unit>[] => {
-  return [
+export const columns = ({
+  onAdd,
+  onEdit,
+  onDelete,
+  userPermissions,
+  isSuperAdmin,
+}: ActionColProps): CustomColumnType<Unit>[] => {
+  const cols: CustomColumnType<Unit>[] = [
     {
       title: 'Id',
       dataIndex: 'id',
@@ -32,10 +39,22 @@ export const columns = ({ onAdd, onEdit, onDelete }: ActionColProps): CustomColu
       required: true,
       width: 200,
     },
-    ActionCol({
-      onAdd,
-      onEdit,
-      onDelete,
-    }),
   ]
+
+  const actionCol = ActionCol<Unit>({
+    onAdd,
+    onEdit,
+    onDelete,
+    userPermissions,
+    isSuperAdmin,
+    actionPermissions: {
+      add: PermissionsType.UnitsAdd,
+      edit: PermissionsType.UnitsEdit,
+      delete: PermissionsType.UnitsDelete,
+    },
+  })
+
+  if (actionCol) cols.push(actionCol)
+
+  return cols
 }

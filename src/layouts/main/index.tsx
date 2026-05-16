@@ -6,24 +6,37 @@ import { Button, Menu, Tooltip, type MenuProps } from 'antd'
 import { routes } from '../../config/router.config'
 import { LogoutOutlined } from '@ant-design/icons'
 import { useUserStore } from '../../stores/userStore'
+import { hasPermission } from '../../helpers/hasPermission'
+import { getPermissions } from '../../helpers/getPermission'
+import { isSuperAdmin } from '../../helpers/getAccessLevel'
 
 const MainLayout = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { clearUser } = useUserStore()
+  const { clearUser, accessToken } = useUserStore()
+
+  const userPermissions = accessToken ? getPermissions(accessToken) : []
+  const superAdmin = isSuperAdmin(accessToken)
 
   const mapRoutesToMenuItems = (): MenuProps['items'] => {
     if (!routes.length) return []
 
-    return routes.map((child) => {
-      const raw = child.path.replace(/^\/+/, '')
-      const title = raw ? raw.replace(/(^\w|-\w)/g, (match) => match.replace('-', ' ').toUpperCase()) : 'NAV'
+    return routes
+      .filter((route) => !route.superAdminRequired || superAdmin)
+      .filter((route) => superAdmin || (route.permission ? hasPermission(route.permission, userPermissions) : true))
+      .filter((route) => route.path != '*')
+      .flatMap((child) => {
+        const raw = child.path.replace(/^\/+/, '')
 
-      return {
-        key: raw || 'nav',
-        label: child.label ?? title,
-      }
-    })
+        const title = raw
+          ? raw.replace(/(^\w|-\w)/g, (match) => match.replace('-', ' ').toUpperCase())
+          : 'NAV'
+
+        return {
+          key: raw || 'nav',
+          label: child.label ?? title,
+        }
+      })
   }
 
   const handleLogout = () => {

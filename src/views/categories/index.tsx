@@ -23,6 +23,11 @@ import CategoryAttributesTab from './components/attributes/CategoryAttributesTab
 import CategoryBrandsTab from './components/brands/CategoryBrandsTab'
 import { useLookup } from '../../hooks/useLookup'
 import type { Attribute } from '../attributes/type'
+import { useUserStore } from '../../stores/userStore'
+import { getPermissions } from '../../helpers/getPermission'
+import { hasPermission } from '../../helpers/hasPermission'
+import { PermissionsType } from '../../types/enums/PermissionsType'
+import { isSuperAdmin } from '../../helpers/getAccessLevel'
 
 export type HomeCategory = {
   id: number
@@ -34,6 +39,7 @@ type CategoryTreeSelectNode = {
   title: string
   value: number
   key: number
+  disableCheckbox?: boolean
   children?: CategoryTreeSelectNode[]
 }
 
@@ -86,7 +92,17 @@ const Row = (props: RowProps) => {
   )
 }
 
-const buildCategoryTreeSelect = (categories?: Category[] | null): CategoryTreeSelectNode[] => {
+const buildCategoryTreeSelect = ({
+  categories,
+  selectedIds,
+  canAdd,
+  canDelete,
+}: {
+  categories?: Category[] | null
+  selectedIds: number[]
+  canAdd: boolean
+  canDelete: boolean
+}): CategoryTreeSelectNode[] => {
   if (!categories?.length) return []
 
   const map = new Map<
@@ -101,6 +117,8 @@ const buildCategoryTreeSelect = (categories?: Category[] | null): CategoryTreeSe
       key: item.id,
       value: item.id,
       title: item.name,
+      disableCheckbox:
+        (!canAdd && !selectedIds.includes(item.id)) || (!canDelete && selectedIds.includes(item.id)),
       parentId: item.parentId ?? null,
       children: [],
     })
@@ -143,6 +161,15 @@ const buildCategoryTreeSelect = (categories?: Category[] | null): CategoryTreeSe
 }
 
 const CategoriesView = () => {
+  const accessToken = useUserStore((s) => s.accessToken)
+  const userPermissions = useMemo(() => (accessToken ? getPermissions(accessToken) : []), [accessToken])
+  const superAdmin = isSuperAdmin(accessToken)
+  const canAddHomeCategory = superAdmin || hasPermission(PermissionsType.HomeCategoriesAdd, userPermissions)
+  const canDeleteHomeCategory =
+    superAdmin || hasPermission(PermissionsType.HomeCategoriesDelete, userPermissions)
+  const canReorderHomeCategories =
+    superAdmin || hasPermission(PermissionsType.HomeCategoriesReorder, userPermissions)
+
   const { data: initialData, loading } = useFetch<Category[]>({
     httpMethod: HttpMethod.GET,
     endpoint: 'categories/get-localized',
@@ -194,21 +221,33 @@ const CategoriesView = () => {
 
   const rootCategories = useMemo(() => data.filter((x) => x.parentId == null), [data])
 
-  const homeCategoryTreeData = useMemo(() => buildCategoryTreeSelect(data), [data])
-
   const selectedHomeCategoryIds = useMemo(() => homeCategories.map((x) => x.categoryId), [homeCategories])
 
-  const draggableHomeCategoriesColumns = useMemo(
-    () => [
-      {
-        key: 'sort',
-        align: 'center' as const,
-        width: 60,
-        render: () => <DragHandle />,
-      },
-      ...homeCategoriesColumns({ categories: data }),
-    ],
-    [data]
+  const homeCategoryTreeData = useMemo(
+    () =>
+      buildCategoryTreeSelect({
+        categories: data,
+        selectedIds: selectedHomeCategoryIds,
+        canAdd: canAddHomeCategory,
+        canDelete: canDeleteHomeCategory,
+      }),
+    [canAddHomeCategory, canDeleteHomeCategory, data, selectedHomeCategoryIds]
+  )
+
+  const homeCategoryTableColumns = useMemo(
+    () =>
+      canReorderHomeCategories
+        ? [
+            {
+              key: 'sort',
+              align: 'center' as const,
+              width: 60,
+              render: () => <DragHandle />,
+            },
+            ...homeCategoriesColumns({ categories: data }),
+          ]
+        : homeCategoriesColumns({ categories: data }),
+    [canReorderHomeCategories, data]
   )
 
   const onAdd = () => {
@@ -288,6 +327,16 @@ const CategoriesView = () => {
     const addedIds = nextIds.filter((id) => !selectedHomeCategoryIds.includes(id))
     const removedIds = selectedHomeCategoryIds.filter((id) => !nextIds.includes(id))
 
+    if (addedIds.length > 0 && !canAddHomeCategory) {
+      message.error('You do not have permission to add home categories')
+      return
+    }
+
+    if (removedIds.length > 0 && !canDeleteHomeCategory) {
+      message.error('You do not have permission to delete home categories')
+      return
+    }
+
     try {
       const createdRecords: HomeCategory[] = []
 
@@ -324,6 +373,7 @@ const CategoriesView = () => {
   }
 
   const handleHomeCategoryDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!canReorderHomeCategories) return
     if (!over || active.id === over.id) return
 
     const activeId = Number(active.id)
@@ -367,13 +417,25 @@ const CategoriesView = () => {
               key: 'attributes',
               label: 'Attributes',
               children: (
-                <CategoryAttributesTab categoryId={record.id} categories={data} attributes={attributes} />
+                <CategoryAttributesTab
+                  categoryId={record.id}
+                  categories={data}
+                  attributes={attributes}
+                  userPermissions={userPermissions}
+                  isSuperAdmin={superAdmin}
+                />
               ),
             },
             {
               key: 'brands',
               label: 'Brands',
-              children: <CategoryBrandsTab categoryId={record.id} />,
+              children: (
+                <CategoryBrandsTab
+                  categoryId={record.id}
+                  userPermissions={userPermissions}
+                  isSuperAdmin={superAdmin}
+                />
+              ),
             },
           ]}
         />
@@ -388,7 +450,14 @@ const CategoriesView = () => {
         bordered
         pagination={false}
         dataSource={children}
-        columns={columns({ onAdd, onEdit, onDelete, categories: data })}
+        columns={columns({
+          onAdd,
+          onEdit,
+          onDelete,
+          categories: data,
+          userPermissions,
+          isSuperAdmin: superAdmin,
+        })}
         expandable={{
           expandedRowRender: renderExpandedContent,
           rowExpandable: () => true,
@@ -416,7 +485,14 @@ const CategoriesView = () => {
                   bordered
                   dataSource={rootCategories}
                   loading={loading}
-                  columns={columns({ onAdd, onEdit, onDelete, categories: data })}
+                  columns={columns({
+                    onAdd,
+                    onEdit,
+                    onDelete,
+                    categories: data,
+                    userPermissions,
+                    isSuperAdmin: superAdmin,
+                  })}
                   pagination={false}
                   scroll={{ y: size.height - 150 }}
                   expandable={{
@@ -429,7 +505,14 @@ const CategoriesView = () => {
                   open={drawerOpen}
                   onClose={() => setDrawerOpen(false)}
                   form={form}
-                  columns={columns({ onAdd, onEdit, onDelete, categories: data })}
+                  columns={columns({
+                    onAdd,
+                    onEdit,
+                    onDelete,
+                    categories: data,
+                    userPermissions,
+                    isSuperAdmin: superAdmin,
+                  })}
                   editingData={editingData}
                   onSubmit={handleSubmit}
                 />
@@ -461,23 +544,35 @@ const CategoriesView = () => {
                   />
                 </div>
 
-                <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleHomeCategoryDragEnd}>
-                  <SortableContext
-                    items={homeCategories.map((item) => item.id.toString())}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <Table
-                      rowKey={(record) => record.id.toString()}
-                      components={{ body: { row: Row } }}
-                      bordered
-                      dataSource={homeCategories}
-                      loading={loading || homeCategoriesLoading}
-                      columns={draggableHomeCategoriesColumns}
-                      pagination={false}
-                      scroll={{ y: size.height - sizeInner.height - 150 }}
-                    />
-                  </SortableContext>
-                </DndContext>
+                {canReorderHomeCategories ? (
+                  <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleHomeCategoryDragEnd}>
+                    <SortableContext
+                      items={homeCategories.map((item) => item.id.toString())}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <Table
+                        rowKey={(record) => record.id.toString()}
+                        components={{ body: { row: Row } }}
+                        bordered
+                        dataSource={homeCategories}
+                        loading={loading || homeCategoriesLoading}
+                        columns={homeCategoryTableColumns}
+                        pagination={false}
+                        scroll={{ y: size.height - sizeInner.height - 150 }}
+                      />
+                    </SortableContext>
+                  </DndContext>
+                ) : (
+                  <Table
+                    rowKey={(record) => record.id.toString()}
+                    bordered
+                    dataSource={homeCategories}
+                    loading={loading || homeCategoriesLoading}
+                    columns={homeCategoryTableColumns}
+                    pagination={false}
+                    scroll={{ y: size.height - sizeInner.height - 150 }}
+                  />
+                )}
               </PageWrapper>
             ),
           },
