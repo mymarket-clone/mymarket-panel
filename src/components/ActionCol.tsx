@@ -13,6 +13,7 @@ export const ActionCol = <T extends { id: number }>({
   userPermissions,
   isSuperAdmin,
   superAdminRequired,
+  extraActions,
 }: ActionColProps): ColumnType<T> | null => {
   const canUseAction = (permission?: PermissionsType | PermissionsType[]) => {
     if (superAdminRequired) return Boolean(isSuperAdmin)
@@ -24,8 +25,12 @@ export const ActionCol = <T extends { id: number }>({
   const canAdd = canUseAction(actionPermissions?.add)
   const canEdit = canUseAction(actionPermissions?.edit)
   const canDelete = canUseAction(actionPermissions?.delete)
+  const visibleExtraActions = (extraActions ?? []).filter((action) => {
+    if (action.superAdminRequired) return Boolean(isSuperAdmin)
+    return canUseAction(action.permission)
+  })
 
-  if (!canAdd && !canEdit && !canDelete) return null
+  if (!canAdd && !canEdit && !canDelete && visibleExtraActions.length === 0) return null
 
   return {
     title: (
@@ -77,6 +82,20 @@ export const ActionCol = <T extends { id: number }>({
             </Tooltip>
           </Popconfirm>
         )}
+
+        {visibleExtraActions.map((action) => (
+          <Tooltip title={action.title} key={action.key}>
+            <Button
+              size="small"
+              danger={action.danger}
+              icon={action.icon}
+              onClick={(e) => {
+                e.stopPropagation()
+                action.onClick(record)
+              }}
+            />
+          </Tooltip>
+        ))}
       </Space>
     ),
   }

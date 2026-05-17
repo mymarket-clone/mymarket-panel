@@ -1,14 +1,20 @@
+import { SettingOutlined } from '@ant-design/icons'
 import { ActionCol } from '../../components/ActionCol'
 import type { ActionColProps } from '../../types/ActionCol'
 import type { CustomColumnType } from '../../types/CustomCol'
 import type { Role } from './type'
+
+type RoleColumnExtras = {
+  onPermissions: (id: number) => void
+}
 
 export const columns = ({
   onAdd,
   onEdit,
   onDelete,
   isSuperAdmin,
-}: ActionColProps): CustomColumnType<Role>[] => {
+  onPermissions,
+}: ActionColProps<RoleColumnExtras>): CustomColumnType<Role>[] => {
   const cols: CustomColumnType<Role>[] = [
     {
       title: 'Id',
@@ -31,6 +37,15 @@ export const columns = ({
     onDelete,
     isSuperAdmin,
     superAdminRequired: true,
+    extraActions: [
+      {
+        key: 'permissions',
+        title: 'Permissions',
+        icon: <SettingOutlined />,
+        onClick: (record) => onPermissions(record.id),
+        superAdminRequired: true,
+      },
+    ],
   })
 
   if (actionCol) cols.push(actionCol)

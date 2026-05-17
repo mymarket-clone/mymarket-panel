@@ -15,6 +15,7 @@ import type { Role } from './type'
 import type { IPaginatedResult } from '../../interfaces/response/IPaginatedResponse'
 import { useUserStore } from '../../stores/userStore'
 import { isSuperAdmin } from '../../helpers/getAccessLevel'
+import PermissionModal from './PermissionModal'
 
 type RolesQuery = {
   page: number
@@ -40,7 +41,9 @@ const RolesView = () => {
   const [editedRolesById, setEditedRolesById] = useState<Record<number, Role>>({})
   const data = (initialData?.items ?? []).map((role) => editedRolesById[role.id] ?? role)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false)
   const [editingData, setEditingData] = useState<Role | null>(null)
+  const [activeRoleId, setActiveRoleId] = useState<number | null>(null)
   const [form] = Form.useForm()
 
   const refetchRoles = async (params = query) => {
@@ -71,6 +74,11 @@ const RolesView = () => {
     } catch (error: any) {
       message.error(error?.response?.data?.message || 'Delete failed')
     }
+  }
+
+  const onPermissions = (id: number) => {
+    setActiveRoleId(id)
+    setPermissionModalOpen(true)
   }
 
   const handleSubmit = async (values: Role) => {
@@ -117,7 +125,7 @@ const RolesView = () => {
           bordered
           dataSource={data}
           loading={loading}
-          columns={columns({ onAdd, onEdit, onDelete, isSuperAdmin: superAdmin })}
+          columns={columns({ onAdd, onEdit, onDelete, onPermissions, isSuperAdmin: superAdmin })}
           pagination={{
             current: initialData?.page ?? query.page,
             pageSize: initialData?.pageSize ?? query.pageSize,
@@ -134,9 +142,18 @@ const RolesView = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         form={form}
-        columns={columns({ onAdd, onEdit, onDelete, isSuperAdmin: superAdmin })}
+        columns={columns({ onAdd, onEdit, onDelete, onPermissions, isSuperAdmin: superAdmin })}
         editingData={editingData}
         onSubmit={handleSubmit}
+      />
+
+      <PermissionModal
+        open={permissionModalOpen}
+        activeRoleId={activeRoleId}
+        onClose={() => {
+          setPermissionModalOpen(false)
+          setActiveRoleId(null)
+        }}
       />
     </PageWrapper>
   )
