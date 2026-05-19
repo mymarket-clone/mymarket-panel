@@ -29,4 +29,10 @@ export enum PermissionsType {
   AttributeOptionsAdd = 102,
   AttributeOptionsEdit = 103,
   AttributeOptionsDelete = 104,
+
+  UsersView = 121,
+  UsersAdd = 122,
+  UsersEdit = 123,
+  UsersDelete = 124,
+  UsersBlock = 125,
 }

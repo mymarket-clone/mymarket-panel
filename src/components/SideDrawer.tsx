@@ -241,6 +241,9 @@ const SideDrawer = <T extends Record<string, any>>({
                         )
                       }
 
+                      case 'password':
+                        return <Input.Password placeholder={`Enter ${label}`} />
+
                       case 'number':
                       case 'string':
                       default:

@@ -5,6 +5,8 @@ import CategoriesView from '../views/categories'
 import NotFoundView from '../views/not-found/not-found'
 import RolesView from '../views/roles'
 import UnitsView from '../views/units'
+import UsersView from '../views/users'
+import { PermissionsType } from '../types/enums/PermissionsType'
 
 export const routes: Route[] = [
   {
@@ -26,6 +28,11 @@ export const routes: Route[] = [
   {
     path: 'roles',
     view: RolesView,
+  },
+  {
+    path: 'users',
+    view: UsersView,
+    permission: PermissionsType.UsersView,
   },
   {
     path: '*',
