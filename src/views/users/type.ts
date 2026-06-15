@@ -9,6 +9,7 @@ export type AdminUserRow = {
   emailVerified: boolean
   isBlocked: boolean
   accessLevel: number
+  balance: number
   postsCount: number
   createdAt: string
   updatedAt?: string | null

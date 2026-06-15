@@ -192,6 +192,13 @@ export const columns = ({
       width: 90,
     },
     {
+      title: 'Balance',
+      dataIndex: 'balance',
+      key: 'balance',
+      width: 110,
+      render: (value: number) => `${Number(value ?? 0).toFixed(2)} GEL`,
+    },
+    {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',
