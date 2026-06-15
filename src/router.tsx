@@ -2,6 +2,7 @@ import { Navigate, useRoutes, type RouteObject } from 'react-router'
 import { routes } from './config/router.config'
 import { useUserStore } from './stores/userStore'
 import LoginView from './views/login'
+import GoogleCallback from './views/login/GoogleCallback'
 import MainLayout from './layouts/main'
 import React from 'react'
 import type { Route } from './types/Route'
@@ -68,6 +69,10 @@ function mapRoutes(appRoutes: Route[]): RouteObject[] {
   })
 
   const routeObjects: RouteObject[] = [
+    {
+      path: '/google-callback',
+      element: <GoogleCallback />,
+    },
     {
       path: '/login',
       element: (
