@@ -121,7 +121,7 @@ const UsersView = () => {
         await refetchUsers()
         message.success('Updated successfully')
       } else {
-        await axiosDefaultInstance.post('users', {
+        await axiosDefaultInstance.post('user-management', {
           ...values,
           isBlocked: values.isBlocked ?? false,
           isSuperAdmin: values.isSuperAdmin ?? false,
