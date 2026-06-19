@@ -17,6 +17,7 @@ import { bindErrorToForm } from '../../utils/bindErrorToForm'
 import { columns, userFormColumns } from './columns'
 import { UsersToolbar } from './styles'
 import type { AdminUserFormValues, AdminUserRow, AdminUsersQuery } from './type'
+import UserPermissionModal from './UserPermissionModal'
 
 const UsersView = () => {
   const accessToken = useUserStore((s) => s.accessToken)
@@ -43,6 +44,8 @@ const UsersView = () => {
   const data = initialData?.items ?? []
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editingData, setEditingData] = useState<AdminUserRow | null>(null)
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false)
+  const [activePermissionUserId, setActivePermissionUserId] = useState<number | null>(null)
   const [form] = Form.useForm<AdminUserFormValues>()
 
   const refetchUsers = async (params = query) => {
@@ -102,6 +105,11 @@ const UsersView = () => {
     } catch (error: any) {
       message.error(error?.response?.data?.message || 'Operation failed')
     }
+  }
+
+  const onPermissions = (record: AdminUserRow) => {
+    setActivePermissionUserId(record.id)
+    setPermissionModalOpen(true)
   }
 
   const handleSubmit = async (values: AdminUserFormValues) => {
@@ -175,6 +183,7 @@ const UsersView = () => {
     onDelete,
     onBlock,
     onSuperAdmin,
+    onPermissions,
     userPermissions,
     isSuperAdmin: superAdmin,
   })
@@ -237,6 +246,15 @@ const UsersView = () => {
         columns={userFormColumns(Boolean(editingData))}
         editingData={editingFormData}
         onSubmit={handleSubmit}
+      />
+
+      <UserPermissionModal
+        open={permissionModalOpen}
+        activeUserId={activePermissionUserId}
+        onClose={() => {
+          setPermissionModalOpen(false)
+          setActivePermissionUserId(null)
+        }}
       />
     </PageWrapper>
   )

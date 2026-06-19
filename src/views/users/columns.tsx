@@ -1,4 +1,4 @@
-import { StopOutlined, UserSwitchOutlined } from '@ant-design/icons'
+import { SafetyCertificateOutlined, StopOutlined, UserSwitchOutlined } from '@ant-design/icons'
 import { Tag } from 'antd'
 import { ActionCol } from '../../components/ActionCol'
 import type { ActionColProps } from '../../types/ActionCol'
@@ -21,6 +21,7 @@ const accessLevelLabels: Record<number, string> = {
 type UserColumnExtras = {
   onBlock: (record: AdminUserRow) => void
   onSuperAdmin: (record: AdminUserRow) => void
+  onPermissions: (record: AdminUserRow) => void
 }
 
 export const userFormColumns = (editing: boolean): CustomColumnType<AdminUserFormValues>[] => [
@@ -108,6 +109,7 @@ export const columns = ({
   onDelete,
   onBlock,
   onSuperAdmin,
+  onPermissions,
   userPermissions,
   isSuperAdmin,
 }: ActionColProps<UserColumnExtras>): CustomColumnType<AdminUserRow>[] => {
@@ -234,10 +236,17 @@ export const columns = ({
         superAdminRequired: true,
         onClick: (record) => onSuperAdmin(record as AdminUserRow),
       },
+      {
+        key: 'permissions',
+        title: 'User permissions',
+        icon: <SafetyCertificateOutlined />,
+        superAdminRequired: true,
+        onClick: (record) => onPermissions(record as AdminUserRow),
+      },
     ],
   })
 
-  if (actionCol) cols.push({ ...actionCol, fixed: 'right', width: 180 })
+  if (actionCol) cols.push({ ...actionCol, fixed: 'right', width: 220 })
 
   return cols
 }
